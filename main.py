@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from shemas import *
-from mock_data import *
+from routers.auth import router as aut_router
+from routers.groups import router as groups_router
+from routers.user import router as user_router
+from routers.university import router as university_router
+
 app = FastAPI()
-
-
 origins = ["*"]
 
 app.add_middleware(
@@ -15,43 +16,141 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(aut_router,tags=["Авторизация"])
+app.include_router(groups_router,tags=["Методы группы / Group methods"])
+app.include_router(user_router,tags=["Методы пользователя / User methods"])
+app.include_router(university_router,tags=["Методы ВУЗА / University methods"])
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/get_user_data/")
-async def get_user_data(email:str,password:str):
-    user:Student = [x for x in Students if (x.email == email) and(x.password == password) ]
-    print()
-    return user
-
-@app.get("/get_groups/")
-async def get_groups() -> List[Group]: 
-    return Groups
-
-@app.post("/university/create/")
-async def create(item: University) -> University:
-    return item
-
-@app.patch("/university/update/")
-async def update(item: University):
-    return item
-
-@app.delete("/university/delete/")
-async def delete(item: University) -> University:
-    return item
 
 
-@app.post("/add_to_favorite_list/")
-async def add_to_favorite_list(user_id:str, group_id:int) -> Student:
-    user =  [x for x in Students if x.id ==user_id ][0]
-    group = [x for x in Groups if x.id ==group_id ][0]
-    user.favorite_list.groups.append(group)
-    return user
 
-@app.get("/get_favorite_list/")
-async def get_list():
-    st =Student(name="john")
-    fw = FavoriteList(1,last_update="10/10/2011",student =st, comment="sds")
-    return {"student":fw.student,"last_update":fw.last_update,"group": fw.groups,"comment":fw.comment}
- 
+upstream app_server {
+    server unix:/home/fastapi-user/fastapi-nginx-gunicorn/run/gunicorn.sock fail_timeout=0;
+}
+
+server {
+    listen 80;
+
+    # add here the ip address of your server
+    # or a domain pointing to that ip (like example.com or www.example.com)
+    
+    keepalive_timeout 10;
+
+    access_log /home/transfer/fastapi/fastapi-nginx-gunicorn/logs/nginx-access.log;
+    error_log /home/transfer/fastapi/fastapi-nginx-gunicorn/logs/nginx-error.log;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+                        
+        if (!-f $request_filename) {
+            proxy_pass http://app_server;
+            break;
+        }
+	}
+}
+# Основные настройки
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+        server_name www.transfer.kemsu.ru;
+        location / {
+                # вначале попытаемся обработать запрос как файл,
+                # затем как каталог, затем вернём ошибку 404
+                try_files $uri $uri/ =404;
+        }
+        
+        # проксируем запрос /xxx на web1
+        location /xxx {
+                proxy_pass http://web1/test/;
+        }
+        
+        # проксируем запрос /yyy на web2
+        location /yyy {
+                proxy_pass http://web2/test/;
+        }
+}
+
+
+upstream app_server {
+    server unix:/home/fastapi-user/fastapi-nginx-gunicorn/run/gunicorn.sock fail_timeout=0;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # add here the ip address of your server
+    # or a domain pointing to that ip (like example.com or www.example.com)
+    server_name www.transfer.kemsu.ru;
+
+    keepalive_timeout 10;
+    client_max_body_size 4G;
+
+    access_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-access.log;
+    error_log /home/fastapi-user/fastapi-nginx-gunicorn/logs/nginx-error.log;
+    
+    location /xxx {
+        # Управление заголовками на прокси сервере
+        proxy_set_header X-Scheme http;
+        proxy_set_header X-Forwarded-Proto http;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-PORT $remote_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        # настройка буфера для прокси сервера
+        proxy_buffering on;
+        proxy_buffer_size 8k;
+        proxy_buffers 8 8k;
+        proxy_pass http://web1/test/;
+        
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http {
+  server {
+    listen 80;
+    client_max_body_size 4G;
+
+    server_name www.transfer.kemsu.ru;
+
+    location /api {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+      proxy_redirect off;
+      proxy_buffering off;
+      proxy_pass http://uvicorn;
+    }
+
+  map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+  }
+
+upstream uvicorn {
+    server unix:/home/fastapi-user/fastapi-nginx-gunicorn/run/gunicorn.sock fail_timeout=0;
+        }
+    }
+}
