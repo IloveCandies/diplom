@@ -2,7 +2,7 @@ import datetime
 from typing import Union, List
 from uuid import uuid4
 from enum import Enum
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 from datetime import date
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ class Education_level(Enum):
 class Education_form(Enum):
     Очная = 1
     Заочная = 2
-    Очно-заочная = 3
+    Очно_заочная = 3
 
 
 @dataclass
@@ -29,6 +29,12 @@ class OOP(BaseModel):
     eduction_profile: str
     education_level:Education_level
     
+@dataclass
+class DisciplinesInShedulePlan(BaseModel):
+    name:str
+    hours:int
+    zet: int
+    education_form: Education_form
 
 @dataclass
 class ShedulePlan(BaseModel):
@@ -36,12 +42,7 @@ class ShedulePlan(BaseModel):
     oop:OOP
     form:Education_form
     period:int
-
-@dataclass
-class DisciplinesInShedulePlan(BaseModel):
-    hours:int
-    zet: int
-    education_form: Education_form
+    disciplines: List[DisciplinesInShedulePlan]
   
 @dataclass
 class DisciplinesInStudentEducation(BaseModel):
@@ -56,15 +57,15 @@ class StudentEducation(BaseModel):
     form:Education_form
     education_end: bool
     date_of_end_education: datetime.date
-    disciplines = List[Discipline]
+    disciplines: List[Discipline]
 
 @dataclass
-class Region(BaseModel):
+class Region():
     number:int
     name:str
 
 @dataclass
-class Sity(BaseModel):
+class Sity():
     region: Region
     name:str
 
@@ -107,10 +108,11 @@ class Group(BaseModel):
     end_year:int
     shedule_plan:ShedulePlan
 
-    def create(id,name,year_of_recruitment,available_places,potential_places,course,end_year):
+    def create(id,name,year_of_recruitment,available_places,potential_places,course,end_year,shedule_plan):
         return(Group(id = id,name=name,year_of_recruitment=year_of_recruitment,
                      available_places = available_places,potential_places=potential_places,
-                     course=course,end_year=end_year))
+                     course=course,end_year=end_year,
+                     shedule_plan = shedule_plan))
     
 class FavoriteList(BaseModel):
     last_update:Union[str, None] = None
@@ -135,4 +137,4 @@ class Student(BaseModel):
     favorite_list: FavoriteList = FavoriteList(last_update=date.today().strftime('%Y-%m-%d'),comment="dddd")
     
     def create(first_name,middle_name,last_name):
-        return Student(id = "ц",first_name=first_name,middle_name=middle_name,last_name=last_name, password="None")
+        return Student(first_name=first_name,middle_name=middle_name,last_name=last_name, password="None",sity=Sity(region=Region(number=1,name="default_region"),name="default_sity"))
