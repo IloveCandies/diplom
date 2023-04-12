@@ -15,3 +15,5 @@ async def add_to_favorite_list(user_id:str, group_id:int) -> Student:
 async def get_list(user_id:str) -> FavoriteList:
     user =  [x for x in Students if x.id ==user_id ][0]
     return user.favorite_list
+
+    

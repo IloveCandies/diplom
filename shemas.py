@@ -24,6 +24,7 @@ class Discipline(BaseModel):
 @dataclass
 #как назвать подумать
 class OOP(BaseModel):
+    id:str
     code: str
     direction: str
     eduction_profile: str
@@ -31,6 +32,7 @@ class OOP(BaseModel):
     
 @dataclass
 class DisciplinesInShedulePlan(BaseModel):
+    id:str
     name:str
     hours:int
     zet: int
@@ -38,6 +40,7 @@ class DisciplinesInShedulePlan(BaseModel):
 
 @dataclass
 class ShedulePlan(BaseModel):
+    id:str
     recruitment_year:datetime.date
     oop:OOP
     form:Education_form
@@ -46,12 +49,14 @@ class ShedulePlan(BaseModel):
   
 @dataclass
 class DisciplinesInStudentEducation(BaseModel):
+    id:str
     hours:int
     zet: int
     education_form: Education_form
 
 @dataclass
 class StudentEducation(BaseModel):
+    id:str
     level:Education_level
     oop:OOP
     form:Education_form
@@ -61,45 +66,50 @@ class StudentEducation(BaseModel):
 
 @dataclass
 class Region():
+    id:str
     number:int
     name:str
 
 @dataclass
 class Sity():
+    id:str
     region: Region
     name:str
 
 @dataclass
 class Education(BaseModel):
+    id:str
     level:Education_level
-    oop:object
-    form:object
+    oop:OOP
+    form:Education_form
     education_end: bool
     date_of_end_education: datetime.date
+    
 
 
 @dataclass
-class Place(BaseModel):
-    id:int
-    speciality: object
-    education_level: int
-    education_program:str
-    fed_budget_seats:int
-    regional_budget_seats:int
-    non_budget_seats:int
+class UniversityStaff(BaseModel):
+    id:str
+    first_name:str
+    middle_name:str
+    last_name:str
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str
+    api_token:str
+
 
 @dataclass
 class University(BaseModel):
-    id:int
+    id:str
     name: str
     sity: Sity
     description: Union[str, None] = None
-    list_places: Union[List[Place],None] = None
-    university_staff: Union[list, None] = None
-    
+    university_staff: Union[List[UniversityStaff], None] = None
+        
 
 class Group(BaseModel):
-    id:int
+    id:str
     name: str
     year_of_recruitment:int
     available_places:int
@@ -130,7 +140,6 @@ class Student(BaseModel):
     last_name:str
     phone:str = "8-800-555-35-35"
     email:str = "default@mail.com"
-    contact_email:str ="fault@mail.com" 
     password:str
     sity:Sity
     education:Union[List[StudentEducation],None] = None
