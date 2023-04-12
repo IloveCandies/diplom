@@ -11,6 +11,8 @@ from routers.disciplines_in_shedule_plan import shedule_plan_disciplines_router
 from routers.disciplines_in_student_education import student_education_disciplines_router
 from routers.student_education import student_education_router
 from routers.university_staff import university_staff_router
+from routers.student import student_router
+from routers.favorite_list import favorite_list_router
 #
 
 from typing import Annotated
@@ -37,8 +39,9 @@ app.include_router(oop_router,tags=["ООП Вуза / University Education Prog
 app.include_router(shedule_plan_router,tags=["Учебный план / Shedule Plan"])
 app.include_router(shedule_plan_disciplines_router,tags=["Дисциплины учебных планов / Disciplines in shedule plans"])
 app.include_router(student_education_disciplines_router,tags=["Дисциплины студентов / Disciplines in student education"])
-app.include_router(student_education_router,tags=["Образование студентов / Student education"])
- 
+app.include_router(student_router,tags=["Студенты / Students"])
+app.include_router(favorite_list_router,tags=["Список избранного студента / Student favorite list"])
+  
 
 
 
