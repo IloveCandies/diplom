@@ -1,14 +1,24 @@
 from fastapi import APIRouter
 from shemas import *
-
-shedule_plan_router = APIRouter()
+from db.models import shedule_plan_table, oop_table,disciplines_table
+from db.init import database
+shedule_plan_router = APIRouter( 
+    responses={404: {"description": "Not found"}})
 
 @shedule_plan_router.post("/shedule/plan/add/", summary="Добавить новый учебный план")
-async def add_shedule_plan() -> ShedulePlan: 
-    return ShedulePlan
+async def add_shedule_plan(item:ShedulePlan) -> ShedulePlan: 
+   
+    query = "INSERT INTO OOP (code, direction eduction_profile,education_level) VALUES (:code, :direction,:eduction_profile,:education_level)"
+    values = {"code":item.oop.code,"direction":item.oop.direction, 
+    "eduction_profile":item.oop.eduction_profile,"education_level":item.oop.education_level}
+    oop_id =  await database.execute(query=query, values=values)
+
+    print(oop_id)
+      
+    return item
 
 @shedule_plan_router.post("/shedule/plan/add/discipline/", summary="Добавить в учебный план дисциплину")
-async def add_shedule_plan(id) -> ShedulePlan: 
+async def add_dicsipline_to_plan(discipline:Discipline, id:int) -> ShedulePlan: 
     return ShedulePlan
 
 @shedule_plan_router.get("/shedule/plan/", summary="Получить данные конкретного плана")

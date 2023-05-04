@@ -18,29 +18,29 @@ class Education_form(Enum):
 
 
 @dataclass
-class Discipline(BaseModel):
+class Discipline():
     name:str
 
 @dataclass
 #как назвать подумать
-class OOP(BaseModel):
-    id:str
+class OOP():
+    id:int
     code: str
     direction: str
     eduction_profile: str
     education_level:Education_level
     
 @dataclass
-class DisciplinesInShedulePlan(BaseModel):
-    id:str
+class DisciplinesInShedulePlan():
+    id:int
     name:str
     hours:int
     zet: int
     education_form: Education_form
 
 @dataclass
-class ShedulePlan(BaseModel):
-    id:str
+class ShedulePlan():
+    id:int
     recruitment_year:datetime.date
     oop:OOP
     form:Education_form
@@ -48,15 +48,16 @@ class ShedulePlan(BaseModel):
     disciplines: List[DisciplinesInShedulePlan]
   
 @dataclass
-class DisciplinesInStudentEducation(BaseModel):
-    id:str
+class DisciplinesInStudentEducation():
+    id:int
+    name:str
     hours:int
     zet: int
     education_form: Education_form
 
 @dataclass
-class StudentEducation(BaseModel):
-    id:str
+class StudentEducation():
+    id:int
     level:Education_level
     oop:OOP
     form:Education_form
@@ -66,19 +67,19 @@ class StudentEducation(BaseModel):
 
 @dataclass
 class Region():
-    id:str
+    id:int
     number:int
     name:str
 
 @dataclass
 class Sity():
-    id:str
+    id:int
     region: Region
     name:str
 
 @dataclass
-class Education(BaseModel):
-    id:str
+class Education():
+    id:int
     level:Education_level
     oop:OOP
     form:Education_form
@@ -89,7 +90,7 @@ class Education(BaseModel):
 
 @dataclass
 class UniversityStaff(BaseModel):
-    id:str
+    id:int
     first_name:str
     middle_name:str
     last_name:str
@@ -101,7 +102,7 @@ class UniversityStaff(BaseModel):
 
 @dataclass
 class University(BaseModel):
-    id:str
+    id:int
     name: str
     sity: Sity
     description: Union[str, None] = None
@@ -109,7 +110,7 @@ class University(BaseModel):
         
 
 class Group(BaseModel):
-    id:str
+    id:int
     name: str
     year_of_recruitment:int
     available_places:int
@@ -134,7 +135,7 @@ class FavoriteList(BaseModel):
 
 
 class Student(BaseModel):
-    id:str
+    id:int
     first_name:str
     middle_name:str
     last_name:str

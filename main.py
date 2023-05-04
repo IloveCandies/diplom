@@ -14,6 +14,7 @@ from routers.university_staff import university_staff_router
 from routers.student import student_router
 from routers.favorite_list import favorite_list_router
 #
+from db.init import database
 
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
@@ -30,6 +31,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+
 
 app.include_router(groups_router,tags=["Методы группы / Group methods"])
 app.include_router(user_router,tags=["Методы пользователя / User methods"])
