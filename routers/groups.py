@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Security
 from asyncpg import exceptions
 from mock_data import *
 from shemas import *
@@ -35,7 +35,7 @@ async def get_groups() -> List[Group]:
     return await database.fetch_all(query)
 
 @group_router.get("/groups/test-token/", summary="Получить данные всех групп | ТЕСТ ЗАПРОСА ТОКЕНА")
-async def get_groups() -> List[Group]: 
+async def get_groups(token:JwtAuthorizationCredentials = Security(access_security)) -> List[Group]: 
     query = group_table.select()
     return await database.fetch_all(query)
 #подумать как делать
