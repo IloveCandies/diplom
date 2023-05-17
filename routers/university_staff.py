@@ -9,11 +9,6 @@ university_staff_router = APIRouter (
     responses={404: {"description": "Not found"}})
 
 
-#JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
-@university_staff_router.post("/university/staff/add/", summary="Добавить сотрудника вуза")
-async def add_student_education() -> UniversityStaff: 
-    return UniversityStaff
-
 @university_staff_router.get("/university/staff/", summary="Получить данные об  сотруднике")
 async def get_student_education(staff_id) -> UniversityStaff: 
     return UniversityStaff

@@ -9,12 +9,13 @@ from fastapi.responses import JSONResponse
 oop_router = APIRouter( responses={404: {"description": "Not found"}})
 
 @oop_router.get("/oop/")
-async def get_oop(id) -> OOP:
+async def get_oop(id:int) -> OOPTableRecord:
     query = oop_table.select().where(oop_table.c.id == id)
+    print(query)
     return await database.fetch_one(query)
 
 @oop_router.get("/oop/list/")
-async def get_list_oop() -> List[OOP]:
+async def get_list_oop() -> List[OOPTableRecord]:
     query = oop_table.select()
     print(query)
     return await database.fetch_all(query)
@@ -30,7 +31,7 @@ async def create(item: OOP) -> OOP:
             code=item.code, direction=item.direction,
             eduction_profile = item.eduction_profile,
             education_level = item.education_level )
-
+            print(query)        
             await database.execute(query)
 
         except (ValueError):
@@ -40,7 +41,7 @@ async def create(item: OOP) -> OOP:
         return item
 
 @oop_router.patch("/oop/path/")
-async def update(item: OOP) -> OOP:
+async def update(item: OOPTableRecord) -> OOP:
     if item.code.isdigit() or item.direction.isdigit() == True:
         print(item.code.isdigit())
         return JSONResponse(status_code=402, content = {"description": "Value Type Error check the shema    "})  
@@ -56,8 +57,6 @@ async def update(item: OOP) -> OOP:
             raise Exception("Ошибка в значении переменной, проверьте данные со схемой")
         except (IndexError):
             raise Exception("Обьект с теким индексом уже существует")
-        except:
-            raise Exception("Непредвиденная ошибка")
         return item
 
 @oop_router.delete("/oop/delete/")

@@ -14,16 +14,14 @@ shedule_plan_disciplines_router = APIRouter (
 @shedule_plan_disciplines_router.post("/shedule/plan/discipline/create/", summary="Добавить новую дисциплину")
 async def create(item: DisciplinesInShedulePlan) -> DisciplinesInShedulePlan:
     query = disciplines_in_shedule_plan_table.insert().values(
-        name = item.name,
         hours = item.hours,
         zet = item.zet,
-        education_form = item.education_form
     )
     await database.execute(query) 
     return item
 
 @shedule_plan_disciplines_router.get("/shedule/plan/discipline/", summary="Получить данные дисциплины")
-async def get_shedule_plan(id) -> DisciplinesInShedulePlan:
+async def get_shedule_plan(id:int) -> DisciplinesInShedulePlan:
     query = disciplines_in_shedule_plan_table.select().where(disciplines_in_shedule_plan_table.c.id == id) 
     return await database.fetch_one(query)
     
@@ -33,13 +31,11 @@ async def get_shedule_plan() ->List[DisciplinesInShedulePlan]:
     return await database.fetch_all(query)
 
 @shedule_plan_disciplines_router.patch("/shedule/plan/discipline/path/", summary="Обновить данные дисциплины")
-async def path_shedule_plan(item: DisciplinesInShedulePlan) -> DisciplinesInShedulePlan:
-    query = disciplines_in_shedule_plan_table.udate().values(
-        name = item.name,
+async def path_shedule_plan(item: DisciplinesInShedulePlan, discipline_in_plan_id:int) -> DisciplinesInShedulePlan:
+    query = disciplines_in_shedule_plan_table.update().values(
         hours = item.hours,
-        zet = item.zet,
-        education_form = item.education_form
-        ).where(disciplines_in_shedule_plan_table.c.id == id) 
+        zet = item.zet
+        ).where(disciplines_in_shedule_plan_table.c.id == discipline_in_plan_id) 
 
     await database.execute(query)
     return item

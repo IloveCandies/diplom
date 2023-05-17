@@ -16,37 +16,61 @@ class Education_form(Enum):
     Заочная = 2
     Очно_заочная = 3
 
+@dataclass
+#как назвать подумать
+class OOP():    
+    code: str
+    direction: str
+    eduction_profile: str
+    education_level:Education_level
+
+@dataclass
+#как назвать подумать
+class OOPTableRecord():
+    id:int    
+    code: str
+    direction: str
+    eduction_profile: str
+    education_level:Education_level
 
 @dataclass
 class Discipline():
     name:str
 
 @dataclass
-#как назвать подумать
-class OOP():
+class DisciplineTableRecord():
     id:int
-    code: str
-    direction: str
-    eduction_profile: str
-    education_level:Education_level
-    
+    name:str
+@dataclass
+class DisciplinesInShedulePlanTablerecord():
+    id:int
+    hours:int
+
+    zet: int
+
 @dataclass
 class DisciplinesInShedulePlan():
-    id:int
     name:str
     hours:int
     zet: int
-    education_form: Education_form
+    
 
 @dataclass
 class ShedulePlan():
-    id:int
+    code:str
     recruitment_year:datetime.date
-    oop:OOP
+    oop: Union[None, OOP] 
     form:Education_form
     period:int
     disciplines: List[DisciplinesInShedulePlan]
-  
+
+@dataclass
+class ShedulePlanTableRecord():
+    code:str
+    recruitment_year:datetime.date
+    form:Education_form
+    period:int
+
 @dataclass
 class DisciplinesInStudentEducation():
     id:int
@@ -87,9 +111,24 @@ class Education():
     date_of_end_education: datetime.date
     
 
+class LoginData(BaseModel):
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str  = ""
 
-@dataclass
 class UniversityStaff(BaseModel):
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str  =""
+    api_token:str =""
+
+class UniversityStaffRecord(BaseModel):
     id:int
     first_name:str
     middle_name:str
@@ -99,7 +138,6 @@ class UniversityStaff(BaseModel):
     password:str
     api_token:str
 
-
 @dataclass
 class University(BaseModel):
     id:int
@@ -108,9 +146,18 @@ class University(BaseModel):
     description: Union[str, None] = None
     university_staff: Union[List[UniversityStaff], None] = None
         
+@dataclass
+class Group():
+    name: str
+    year_of_recruitment:int
+    available_places:int
+    potential_places:int
+    course:int
+    end_year:int
 
-class Group(BaseModel):
-    id:int
+# json учебного плана
+@dataclass
+class GroupDetail():
     name: str
     year_of_recruitment:int
     available_places:int
@@ -119,11 +166,18 @@ class Group(BaseModel):
     end_year:int
     shedule_plan:ShedulePlan
 
-    def create(id,name,year_of_recruitment,available_places,potential_places,course,end_year,shedule_plan):
-        return(Group(id = id,name=name,year_of_recruitment=year_of_recruitment,
-                     available_places = available_places,potential_places=potential_places,
-                     course=course,end_year=end_year,
-                     shedule_plan = shedule_plan))
+#схема соответующая модели бд
+@dataclass
+class GroupTableRecord():
+    id:int
+    name: str
+    year_of_recruitment:int
+    available_places:int
+    potential_places:int
+    course:int
+    end_year:int
+    shedule_plan:int
+
     
 class FavoriteList(BaseModel):
     last_update:Union[str, None] = None
@@ -134,7 +188,7 @@ class FavoriteList(BaseModel):
         self.last_update = last_update
 
 
-class Student(BaseModel):
+class StudentTableRecord(BaseModel):
     id:int
     first_name:str
     middle_name:str
@@ -142,9 +196,18 @@ class Student(BaseModel):
     phone:str = "8-800-555-35-35"
     email:str = "default@mail.com"
     password:str
-    sity:Sity
+    sity: int
+    favorite_list: int
+
+class Student(BaseModel):
+    first_name:str
+    middle_name:str
+    last_name:str
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str
+    sity: Union[Sity,None] = None
     education:Union[List[StudentEducation],None] = None
-    favorite_list: FavoriteList = FavoriteList(last_update=date.today().strftime('%Y-%m-%d'),comment="dddd")
+    favorite_list: Union[FavoriteList,None] = None 
     
-    def create(first_name,middle_name,last_name):
-        return Student(first_name=first_name,middle_name=middle_name,last_name=last_name, password="None",sity=Sity(region=Region(number=1,name="default_region"),name="default_sity"))
+ 

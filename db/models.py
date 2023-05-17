@@ -22,15 +22,14 @@ disciplines_table = Table(
     metadata,
     Column("id", Integer, primary_key=True, index=True),
     Column("name", String, unique=True),
-    Column("hours", Integer),
-    Column("zet", Integer),
-    Column("education_form", Enum(Education_form)),
 ) 
 
 disciplines_in_shedule_plan_table = Table(
     "DisciplineInShedulePlan",
     metadata,
     Column("id", Integer, primary_key=True, index=True),
+    Column("hours", Integer),
+    Column("zet", Integer),
     Column("shedule_plan",Integer, ForeignKey("ShedulePlan.id")),
     Column("discipline",Integer, ForeignKey("Disciplines.id")),
 ) 
@@ -39,15 +38,12 @@ shedule_plan_table = Table(
     "ShedulePlan",
     metadata,
     Column("id", Integer, primary_key=True, index=True),
+    Column("code", String, unique=True),
     Column("recruitment_year", Date),
     Column("education_form", Enum(Education_form)),
     Column("period", Integer),
     Column("oop",Integer, ForeignKey("OOP.id"))
 )
-
-
-
-
 
 disciplines_in_student_education_table = Table(
     "DisciplinesInStudentEducation",
@@ -67,5 +63,46 @@ student_education_table = Table(
     Column("period", Integer)
 )
 
+group_table = Table(
+    "Group",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name",String, unique = True),
+    Column("year_of_recruitment", Integer),
+    Column("available_places", Integer,),
+    Column("potential_places",Integer),
+    Column("course", Integer),
+    Column("end_year", Integer),
+    Column("shedule_plan",Integer, ForeignKey("ShedulePlan.id")),
+)
 
+staff_table = Table(
+    "UniversityStaff",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("first_name",String),
+    Column("middle_name", String),
+    Column("last_name", String),
+    Column("phone", String, unique = True),
+    Column("email", String, unique = True),
+    Column("password", String),
+    Column("api_token", String),
+)
+
+student_table = Table(
+    "Student",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("first_name",String),
+    Column("middle_name", String),
+    Column("last_name", String),
+    Column("phone", String,),
+    Column("email",String),
+    Column("password", String),
+    
+)
 metadata.create_all(engine)
+
+#Column("password", String),
+#Column("password", String),
+#Column("password", String),
