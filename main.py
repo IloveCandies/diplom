@@ -31,7 +31,7 @@ async def not_found_error(request: Request, exc: HTTPException):
 
 exception_handlers = {404: not_found_error}
 
-app = FastAPIOffline(exception_handlers=exception_handlers)
+app = FastAPI(exception_handlers=exception_handlers)
 origins = ["*"]
 
 app.add_middleware(
