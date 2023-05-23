@@ -31,7 +31,7 @@ async def not_found_error(request: Request, exc: HTTPException):
 
 exception_handlers = {404: not_found_error}
 
-app = FastAPI(exception_handlers=exception_handlers,openapi_url="openapi.json")
+app = FastAPI(exception_handlers=exception_handlersdocs_url='/api/docs',redoc_url='/api/redoc',openapi_url='/openapi.json')
 origins = ["*"]
 
 app.add_middleware(
