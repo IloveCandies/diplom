@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 #
@@ -17,13 +17,21 @@ from routers.discipline import discipline_router
 from routers.auth import auth_router
 #
 from db.init import database
+from fastapi_offline import FastAPIOffline
 
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+from fastapi.responses import RedirectResponse
+from fastapi.exceptions import HTTPException
 
 
-app = FastAPI()
+async def not_found_error(request: Request, exc: HTTPException):
+    return RedirectResponse('https://fastapi.tiangolo.com')
+
+exception_handlers = {404: not_found_error}
+
+app = FastAPIOffline(exception_handlers=exception_handlers)
 origins = ["*"]
 
 app.add_middleware(

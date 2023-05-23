@@ -86,6 +86,7 @@ staff_table = Table(
     Column("phone", String, unique = True),
     Column("email", String, unique = True),
     Column("password", String),
+    Column("salt", String),
     Column("api_token", String),
 )
 
@@ -99,6 +100,24 @@ student_table = Table(
     Column("phone", String,),
     Column("email",String),
     Column("password", String),
+    Column("salt", String),
+    
+)
+
+favorites_table = Table(
+    "FavoriteList",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("student",Integer, ForeignKey("Student.id"),  unique = True), 
+)
+
+favorites_item_table = Table(
+    "FavoriteItem",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("favorite_list_id",Integer, ForeignKey("FavoriteList.id")),
+    Column("group_id",Integer, ForeignKey("Group.id")),
+    Column("message", String),
     
 )
 metadata.create_all(engine)

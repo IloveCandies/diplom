@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from mock_data import *
 from shemas import *
 
 university_router = APIRouter()

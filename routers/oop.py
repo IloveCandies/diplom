@@ -1,7 +1,6 @@
 
 from fastapi import APIRouter
 from asyncpg import exceptions
-from mock_data import *
 from shemas import *
 from db.models import oop_table
 from db.init import database

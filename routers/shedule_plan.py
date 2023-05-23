@@ -9,6 +9,28 @@ from fastapi.responses import JSONResponse
 shedule_plan_router = APIRouter( responses={404: {"description": "Not found"}})
 
 
+@shedule_plan_router.get("/shedule/plan/", summary="Получить данные конкретного плана")
+async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
+    query = disciplines_in_shedule_plan_table.select().where(disciplines_in_shedule_plan_table.c.shedule_plan == shedule_plan_id)
+
+    disciplines_in_plan = [ tuple(item.values())[0:3] for item  in await database.fetch_all(query)]
+    query = shedule_plan_table.select().where(shedule_plan_table.c.id == shedule_plan_id)
+    shedule_plan = await database.fetch_one(query)
+    
+    query = oop_table.select().where(oop_table.c.id ==shedule_plan.oop)
+    oop_detail = await database.fetch_one(query)
+    return ShedulePlan( code = shedule_plan.code,
+                        recruitment_year = shedule_plan.recruitment_year,
+                        form = Education_form [shedule_plan.education_form],
+                        period = shedule_plan.period,
+                        oop = OOP(code=oop_detail["code"],direction=oop_detail["direction"],
+                                eduction_profile=oop_detail["eduction_profile"],
+                                education_level=oop_detail["education_level"])
+                        ,disciplines = disciplines_in_plan)
+
+
+
+
 #переписать
 @shedule_plan_router.post("/shedule/plan/create/", summary="Создать новый учебный план")
 async def add_shedule_plan(item:ShedulePlanTableRecord) -> ShedulePlanTableRecord:
@@ -72,20 +94,7 @@ async def add_dicsipline_to_plan(item:DisciplinesInShedulePlan, shedule_plan_id:
                         period = shedule_plan.period,oop = shedule_plan.oop,disciplines = disciplines_in_plan)
 
 
-@shedule_plan_router.get("/shedule/plan/", summary="Получить данные конкретного плана")
-async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
-    query = disciplines_in_shedule_plan_table.select().where(disciplines_in_shedule_plan_table.c.shedule_plan == shedule_plan_id)
 
-    disciplines_in_plan = [ tuple(item.values())[0:3] for item  in await database.fetch_all(query)]
-    print(disciplines_in_plan)
-    query = shedule_plan_table.select().where(shedule_plan_table.c.id == shedule_plan_id)
-    shedule_plan = await database.fetch_one(query)
-
-    return ShedulePlan( code = shedule_plan.code,
-                        recruitment_year = shedule_plan.recruitment_year,
-                        form = Education_form [shedule_plan.education_form],
-                        period = shedule_plan.period,oop = shedule_plan.oop,disciplines = disciplines_in_plan)
-  
 #дописать возвращение в json списка элементов
 
 #переписать
@@ -151,6 +160,31 @@ async def add_shedule_plan(item:ShedulePlan) -> ShedulePlan:
       
     return item
 
+
+
+
+
+@shedule_plan_router.post("/shedule/plan/add/oop/", summary="Добавить в учебный план дисциплину")
+async def add_oop_to_plan(shedule_plan_code:str, oop_code:str) -> ShedulePlanDetail:
+    query = oop_table.select().where(oop_table.c.code == oop_code)
+    oop = await database.fetch_one(query)
+    print(oop)
+    query = shedule_plan_table.update().values(oop = oop["id"]).where(shedule_plan_table.c.code == shedule_plan_code)
+    
+    if oop == None:
+        return JSONResponse(status_code=422, content = {"description": "Дисциплина не существует чтобы создать дисциплину воспользуйтесь методом /disciplines/create/"})
+    await database.execute(query)
+    query = shedule_plan_table.select().where(shedule_plan_table.c.code == shedule_plan_code)
+    shedule_plan = await database.fetch_one(query)
+
+    return ShedulePlan (code = shedule_plan["code"],
+            form= shedule_plan["education_form"],
+            recruitment_year = shedule_plan["recruitment_year"],
+            period =shedule_plan["period"],
+            oop = oop, disciplines = shedule_plan["disciplines"])
+
+
+  
 @shedule_plan_router.get("/shedule/plans/", summary="Получить данные всех учебных планов НЕ ДОДЕЛАННО")
 async def get_shedule_plans() -> List[ShedulePlan]: 
     query = shedule_plan_table.select()

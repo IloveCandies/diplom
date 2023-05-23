@@ -1,5 +1,5 @@
 import datetime
-from typing import Union, List
+from typing import Union, List, Tuple
 from uuid import uuid4
 from enum import Enum
 from pydantic.dataclasses import dataclass
@@ -16,9 +16,8 @@ class Education_form(Enum):
     Заочная = 2
     Очно_заочная = 3
 
-@dataclass
 #как назвать подумать
-class OOP():    
+class OOP(BaseModel):    
     code: str
     direction: str
     eduction_profile: str
@@ -45,7 +44,6 @@ class DisciplineTableRecord():
 class DisciplinesInShedulePlanTablerecord():
     id:int
     hours:int
-
     zet: int
 
 @dataclass
@@ -55,14 +53,24 @@ class DisciplinesInShedulePlan():
     zet: int
     
 
-@dataclass
-class ShedulePlan():
+class ShedulePlan(BaseModel):
     code:str
     recruitment_year:datetime.date
     oop: Union[None, OOP] 
     form:Education_form
     period:int
-    disciplines: List[DisciplinesInShedulePlan]
+    disciplines:Union[List, List[DisciplinesInShedulePlan]] =[]
+    
+    class Config:
+        orm_mode = True
+
+@dataclass
+class ShedulePlanDetail():
+    code:str
+    recruitment_year:datetime.date
+    oop: Union[None, OOP] 
+    form:Education_form
+    period:int
 
 @dataclass
 class ShedulePlanTableRecord():
@@ -138,7 +146,6 @@ class UniversityStaffRecord(BaseModel):
     password:str
     api_token:str
 
-@dataclass
 class University(BaseModel):
     id:int
     name: str
@@ -146,18 +153,18 @@ class University(BaseModel):
     description: Union[str, None] = None
     university_staff: Union[List[UniversityStaff], None] = None
         
-@dataclass
-class Group():
+
+class Group(BaseModel):
     name: str
     year_of_recruitment:int
     available_places:int
     potential_places:int
     course:int
     end_year:int
+    shedule_plan_id:int
 
 # json учебного плана
-@dataclass
-class GroupDetail():
+class GroupDetail(BaseModel):
     name: str
     year_of_recruitment:int
     available_places:int
@@ -166,9 +173,11 @@ class GroupDetail():
     end_year:int
     shedule_plan:ShedulePlan
 
+    class Config:
+        orm_mode = True
+
 #схема соответующая модели бд
-@dataclass
-class GroupTableRecord():
+class GroupTableRecord(BaseModel):
     id:int
     name: str
     year_of_recruitment:int
@@ -178,16 +187,31 @@ class GroupTableRecord():
     end_year:int
     shedule_plan:int
 
-    
+
+
+
+#Переименовать схемы потом
+@dataclass
+class StudentFavoriteListItem():
+    group: GroupDetail
+    messge:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой"
+
+    class Config:
+        orm_mode = True
+
 class FavoriteList(BaseModel):
-    last_update:Union[str, None] = None
-    groups: list[Group] = []
-    comment:Union[str, None] = None
+    groups: list[StudentFavoriteListItem]
     
-    def create(self,last_update):
-        self.last_update = last_update
+    class Config:
+        orm_mode = True
 
+class FavoriteListItem(BaseModel):
+    messge:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой"
 
+    class Config:
+        orm_mode = True
+    
+####
 class StudentTableRecord(BaseModel):
     id:int
     first_name:str
@@ -210,4 +234,10 @@ class Student(BaseModel):
     education:Union[List[StudentEducation],None] = None
     favorite_list: Union[FavoriteList,None] = None 
     
- 
+class Item(BaseModel):
+    id: str
+    value: str
+
+
+class Message(BaseModel):
+    message: str
