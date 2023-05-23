@@ -60,7 +60,7 @@ app.include_router(oop_router,tags=["ООП"])
 app.include_router(shedule_plan_router,tags=["Учебный план 90% сделано"])
 
 app.include_router(shedule_plan_disciplines_router,tags=["Дисциплины учебных планов В РАЗРАБОТКЕ 70% "])
-app.include_router(favorite_list_router,tags=["Список избранного студента В РАЗРАБОТКЕ 40% "])
+app.include_router(favorite_list_router,tags=["Список избранного студента"])
 app.include_router(student_router,tags=["Студенты в РАЗРАБОТКЕ 50%"])
 
 app.include_router(university_router,tags=["Методы ВУЗА ПОКА НЕ РЕАЛИЗОВАННЫ "])

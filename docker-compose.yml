@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: sudo systemctl start fastapi
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
