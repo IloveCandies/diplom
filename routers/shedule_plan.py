@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 shedule_plan_router = APIRouter( responses={404: {"description": "Not found"}})
 
 
-@shedule_plan_router.get("/shedule/plan/", summary="Получить данные конкретного плана")
+@shedule_plan_router.get("/api/v1/shedule/plan/", summary="Получить данные конкретного плана")
 async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
     query = disciplines_in_shedule_plan_table.select().where(disciplines_in_shedule_plan_table.c.shedule_plan == shedule_plan_id)
 
@@ -32,7 +32,7 @@ async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
 
 
 #переписать
-@shedule_plan_router.post("/shedule/plan/create/", summary="Создать новый учебный план")
+@shedule_plan_router.post("/api/v1/shedule/plan/create/", summary="Создать новый учебный план")
 async def add_shedule_plan(item:ShedulePlanTableRecord) -> ShedulePlanTableRecord:
     query = """INSERT INTO "ShedulePlan" (code, recruitment_year, education_form, period,oop) 
     SELECT :code, :recruitment_year, :education_form, :period, :oop
@@ -52,7 +52,7 @@ async def add_shedule_plan(item:ShedulePlanTableRecord) -> ShedulePlanTableRecor
 
     return item
 
-@shedule_plan_router.post("/shedule/plan/add/discipline/", summary="Добавить в учебный план дисциплину")
+@shedule_plan_router.post("/api/v1/shedule/plan/add/discipline/", summary="Добавить в учебный план дисциплину")
 async def add_dicsipline_to_plan(item:DisciplinesInShedulePlan, shedule_plan_id:int) -> ShedulePlan:
     
     query = disciplines_table.select().where(disciplines_table.c.name == item.name)
@@ -98,7 +98,7 @@ async def add_dicsipline_to_plan(item:DisciplinesInShedulePlan, shedule_plan_id:
 #дописать возвращение в json списка элементов
 
 #переписать
-@shedule_plan_router.post("/shedule/plan/export/", summary="Загрузить учебный план из json НЕ ДОДЕЛАННО")
+@shedule_plan_router.post("/api/v1/shedule/plan/export/", summary="Загрузить учебный план из json НЕ ДОДЕЛАННО")
 async def add_shedule_plan(item:ShedulePlan) -> ShedulePlan: 
 
     query = """INSERT INTO "OOP" (code, direction, eduction_profile,education_level) 

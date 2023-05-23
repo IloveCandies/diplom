@@ -32,7 +32,7 @@ async def update_comment(favorite_list_item_id,favorite_list_id,group_id,message
         and(favorites_item_table.c.group_id == group_id))
     await database.execute(update_comment_query)
 
-@favorite_list_router.post("/favorites/add/", summary="Добавить в список избранного НЕ ДОДЕЛАННО")
+@favorite_list_router.post("/api/v1/favorites/add/", summary="Добавить в список избранного НЕ ДОДЕЛАННО")
 async def add_group_to_favorites(group_name:str, response: Response,request: Request, 
                                  message:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой"):
     
@@ -74,7 +74,7 @@ async def add_group_to_favorites(group_name:str, response: Response,request: Req
         return True
     
 
-@favorite_list_router.get("/favorites/")
+@favorite_list_router.get("/api/v1/favorites/")
 async def get_favorites(request: Request) -> FavoriteList: 
     user_id = int(request.cookies.get("user_id"))
     user_favorite_list = FavoriteList(groups=[])
@@ -88,7 +88,7 @@ async def get_favorites(request: Request) -> FavoriteList:
     print(type(user_favorite_list))
     return  user_favorite_list.dict()
    
-@favorite_list_router.delete("/favorites/remove/", summary="Удалить из списка избранного  НЕ ДОДЕЛАННО")
+@favorite_list_router.delete("/api/v1/favorites/remove/", summary="Удалить из списка избранного  НЕ ДОДЕЛАННО")
 async def remove_group_from_list(group_name:str, request: Request):
     user_id = int(request.cookies.get("user_id"))
     favorite_list_id = await get_list(user_id)

@@ -9,7 +9,7 @@ from .oop import get_oop
 from .shedule_plan import get_shedule_plan
 group_router = APIRouter(responses={404: {"model": Message},400: {"model": Message}})
 
-@group_router.post("/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
+@group_router.post("/api/v1/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
 async def add_group(item: Group) -> Group: 
     query = group_table.insert().values(
         name = item.name, year_of_recruitment = item.year_of_recruitment,
@@ -23,7 +23,7 @@ async def add_group(item: Group) -> Group:
         "msg": "Группа с таким именем уже существует "}})
     return item
 
-@group_router.get("/group/", summary="Получить данные конкретной группы по id")
+@group_router.get("/api/v1/group/", summary="Получить данные конкретной группы по id")
 async def get_group(group_name:str) ->GroupDetail: 
     query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(query)
@@ -50,7 +50,7 @@ async def get_group_by_id(id:int) ->GroupDetail:
             "shedule_plan":shedule_plan}
 
 
-@group_router.get("/groups/", summary="Получить данные всех групп")
+@group_router.get("/api/v1/groups/", summary="Получить данные всех групп")
 async def get_groups() -> List[GroupDetail]: 
     query = group_table.select()
     groups = await database.fetch_all(query)
@@ -61,7 +61,7 @@ async def get_groups() -> List[GroupDetail]:
         detailed_groups.append(group_detail)
     return detailed_groups
     
-@group_router.post("/group/add/plan", summary="Добавить учебный план в группу")
+@group_router.post("/api/v1/group/add/plan", summary="Добавить учебный план в группу")
 async def add_plan(shedule_plan_code:str, group_name:str) -> GroupDetail: 
     query = shedule_plan_table.select().where(shedule_plan_table.c.code == shedule_plan_code)
     shedule_plan = await database.fetch_one(query)
@@ -105,26 +105,26 @@ odd_responses = {
     },
 }
 
-@group_router.get("/groups/test-token/", summary="Получить данные всех групп | ТЕСТ ЗАПРОСА ТОКЕНА")
+@group_router.get("/api/v1/groups/test-token/", summary="Получить данные всех групп | ТЕСТ ЗАПРОСА ТОКЕНА")
 async def get_groups(token:JwtAuthorizationCredentials = Security(access_security)) -> List[Group]: 
     query = group_table.select()
     return await database.fetch_all(query)
 
 #подумать как делать
-@group_router.post("/group/add/plan/", summary="Добавить план в группу  НЕ ДОДЕЛАННО")
+@group_router.post("/api/v1/group/add/plan/", summary="Добавить план в группу  НЕ ДОДЕЛАННО")
 async def add_shedule_plan(shedule_plan_id:int) -> Group: 
     return GroupTableRecord
 
 
-@group_router.post("/group/detail/", summary="Детали группы НЕ ДОДЕЛАННО")
+@group_router.post("/api/v1/group/detail/", summary="Детали группы НЕ ДОДЕЛАННО")
 async def add_group(item: Group) -> GroupDetail: 
     return item
 
-@group_router.patch("/group/path/", summary="Обновить данные группы, взятой по id  НЕ СДЕЛАННО")
+@group_router.patch("/api/v1/group/path/", summary="Обновить данные группы, взятой по id  НЕ СДЕЛАННО")
 async def path_group(id): 
     return False
    
-@group_router.delete("/group/delete/", summary="Удалить групу, взятую по id  НЕ СДЕЛАННО")
+@group_router.delete("/api/v1/group/delete/", summary="Удалить групу, взятую по id  НЕ СДЕЛАННО")
 async def delete_group(id) -> Group: 
     return Group
 

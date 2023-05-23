@@ -7,19 +7,19 @@ from db.init import database
 from fastapi.responses import JSONResponse
 oop_router = APIRouter( responses={404: {"description": "Not found"}})
 
-@oop_router.get("/oop/")
+@oop_router.get("/api/v1/oop/")
 async def get_oop(id:int) -> OOPTableRecord:
     query = oop_table.select().where(oop_table.c.id == id)
     print(query)
     return await database.fetch_one(query)
 
-@oop_router.get("/oop/list/")
+@oop_router.get("/api/v1/oop/list/")
 async def get_list_oop() -> List[OOPTableRecord]:
     query = oop_table.select()
     print(query)
     return await database.fetch_all(query)
 
-@oop_router.post("/oop/create/")
+@oop_router.post("/api/v1/oop/create/")
 async def create(item: OOP) -> OOP:
     if item.code.isdigit() or item.direction.isdigit() == True:
         print(item.code.isdigit())
@@ -39,7 +39,7 @@ async def create(item: OOP) -> OOP:
            return JSONResponse(status_code=422, content = {"description": "Обьект с таким кодом уже существует"})
         return item
 
-@oop_router.patch("/oop/path/")
+@oop_router.patch("/api/v1/oop/path/")
 async def update(item: OOPTableRecord) -> OOP:
     if item.code.isdigit() or item.direction.isdigit() == True:
         print(item.code.isdigit())
@@ -58,7 +58,7 @@ async def update(item: OOPTableRecord) -> OOP:
             raise Exception("Обьект с теким индексом уже существует")
         return item
 
-@oop_router.delete("/oop/delete/")
+@oop_router.delete("/api/v1/oop/delete/")
 async def delete_oop(id:int):
     try:
         query = oop_table.delete().where(oop_table.c.id ==id)
