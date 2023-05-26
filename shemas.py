@@ -64,31 +64,30 @@ class ShedulePlan(BaseModel):
     class Config:
         orm_mode = True
 
-@dataclass
-class ShedulePlanDetail():
+
+class ShedulePlanDetail(BaseModel):
     code:str
     recruitment_year:datetime.date
     oop: Union[None, OOP] 
     form:Education_form
     period:int
 
-@dataclass
-class ShedulePlanTableRecord():
+
+class ShedulePlanTableRecord(BaseModel):
     code:str
     recruitment_year:datetime.date
     form:Education_form
     period:int
 
-@dataclass
-class DisciplinesInStudentEducation():
+class DisciplinesInStudentEducation(BaseModel):
     id:int
     name:str
     hours:int
     zet: int
     education_form: Education_form
 
-@dataclass
-class StudentEducation():
+
+class StudentEducation(BaseModel):
     id:int
     level:Education_level
     oop:OOP
@@ -97,8 +96,7 @@ class StudentEducation():
     date_of_end_education: datetime.date
     disciplines: List[Discipline]
 
-@dataclass
-class Region():
+class Region(BaseModel):
     id:int
     number:int
     name:str
@@ -112,8 +110,8 @@ class City(BaseModel):
     region: Union[Region,None] = None
     name:str = ""
 
-@dataclass
-class Education():
+
+class Education(BaseModel):
     id:int
     level:Education_level
     oop:OOP
@@ -174,7 +172,7 @@ class GroupDetail(BaseModel):
     potential_places:int
     course:int
     end_year:int
-    shedule_plan:ShedulePlan
+    shedule_plan:Union[ShedulePlan,None] = None
 
     class Config:
         orm_mode = True

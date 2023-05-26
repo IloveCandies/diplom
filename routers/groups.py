@@ -55,23 +55,23 @@ async def add_group(item: Group) -> Group:
 async def get_group(group_name:str) ->GroupDetail: 
     query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(query)
-    shedule_plan = await get_group_by_shedule_plan_id(group["shedule_plan"])
+    shedule_plan = await get_shedule_plan_by_id(group["shedule_plan"])
     print(shedule_plan)
     if shedule_plan == None:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
     else:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan)
 
 
 
 
 
 @group_router.get("/api/v1/groups/", summary="Получить данные всех групп")
-async def get_groups(): 
+async def get_groups() ->List[GroupDetail]: 
     query = group_table.select()
     groups = await database.fetch_all(query)
     print(groups)
