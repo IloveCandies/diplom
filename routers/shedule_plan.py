@@ -22,10 +22,10 @@ async def get_shedule_plan_by_id(shedule_plan_id: int) -> Union[ShedulePlan,None
         print(shedule_plan.education_form)
         query = oop_table.select().where(oop_table.c.id == shedule_plan.oop)   
         oop_detail = await database.fetch_one(query)
-        print(shedule_plan.education_form.value)
+        print(shedule_plan.education_form)
         return ShedulePlan( code = shedule_plan.code,
                         recruitment_year = shedule_plan.recruitment_year,
-                        form = shedule_plan.education_form.value,
+                        form = shedule_plan.education_form,
                         period = shedule_plan.period,
                         oop = OOP(code=oop_detail["code"],direction=oop_detail["direction"],
                                 eduction_profile=oop_detail["eduction_profile"],
