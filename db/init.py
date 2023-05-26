@@ -7,11 +7,12 @@ import databases
 
 database = databases.Database(SQLALCHEMY_DATABASE_URL)
 
-if CONNECT_ARGS == {}:
+'''if CONNECT_ARGS == {}:
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
 else:
     engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=CONNECT_ARGS)
-
+'''
+engine = create_engine("sqlite:///./transfer.db", connect_args={"check_same_thread":True})
 metadata = MetaData()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
