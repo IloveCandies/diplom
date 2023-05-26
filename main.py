@@ -31,7 +31,7 @@ async def not_found_error(request: Request, exc: HTTPException):
 
 exception_handlers = {404: not_found_error}
 # root_path = "/api/v1"
-app = FastAPI(exception_handlers=exception_handlers, )
+app = FastAPI(exception_handlers=exception_handlers,root_path = "/api/v1" )
 origins = ["*"]
 
 app.add_middleware(
