@@ -14,7 +14,7 @@ auth_router = APIRouter (
     responses={404: {"description": "Not found"}})
 
 
-@auth_router.post("/api/v1/sign_up/staff/", summary="")
+@auth_router.post("/sign_up/staff/", summary="")
 async def auth(response: Response,request: Request, login_data:LoginData ): 
     values = { "first_name":login_data.first_name,"middle_name":login_data.middle_name, 
                 "last_name":login_data.last_name,
@@ -42,7 +42,7 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
 
     
 
-@auth_router.post("/api/v1/sign_up/student/", summary="")
+@auth_router.post("/sign_up/student/", summary="")
 async def auth(response: Response,request: Request, login_data:LoginData ): 
     values = { "first_name":login_data.first_name,"middle_name":login_data.middle_name, 
     "last_name":login_data.last_name,"phone":login_data.phone, "email":login_data.email }
@@ -65,7 +65,7 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
 
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
-@auth_router.post("/api/v1/sign_in/staff/", summary="")
+@auth_router.post("/sign_in/staff/", summary="")
 async def sign_in(email:str, password:str)->UniversityStaffRecord: 
     query = staff_table.select().where(staff_table.c.email == email)
     staff = await database.fetch_one(query)
@@ -75,7 +75,7 @@ async def sign_in(email:str, password:str)->UniversityStaffRecord:
         return staff["password"]
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
-@auth_router.post("/api/v1/sign_in/student/", summary="")
+@auth_router.post("/sign_in/student/", summary="")
 async def sign_in(email:str, password:str, response: Response)->Student: 
     query = student_table.select().where(student_table.c.email == email)
     student = await database.fetch_one(query)
@@ -85,7 +85,7 @@ async def sign_in(email:str, password:str, response: Response)->Student:
     else:
         return student["password"]
 
-@auth_router.post("/api/v1/logout/", summary="")
+@auth_router.post("/logout/", summary="")
 async def logout() -> UniversityStaff: 
     return UniversityStaff
 
@@ -95,12 +95,12 @@ async def refresh_token (token:JwtAuthorizationCredentials = Security(access_sec
     return staff   
 
 
-@auth_router.get("/api/v1/refresh/token", summary="")
+@auth_router.get("/refresh/token", summary="")
 async def whoami(): 
     token = access_security.create_access_token(subject={})
     ref_token = access_security.create_refresh_token(subject={})
     return token, ref_token
 
-@auth_router.get("/api/v1/whoami/", summary="")
+@auth_router.get("/whoami/", summary="")
 async def whoami(token:JwtAuthorizationCredentials = Security(access_security)): 
     return token

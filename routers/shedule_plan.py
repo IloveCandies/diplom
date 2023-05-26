@@ -42,7 +42,7 @@ async def get_shedule_plan_by_id(shedule_plan_id: int) -> Union[ShedulePlan,None
 #                        ,disciplines = [])
 # oop_detail = await database.fetch_one(query)
 
-"""shedule_plan_router.get("/api/v1/shedule/plan/", summary="Получить данные конкретного плана")
+"""shedule_plan_router.get("/shedule/plan/", summary="Получить данные конкретного плана")
 async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
     query = shedule_plan_table.select().where(shedule_plan_table.c.code == shedule_plan_id)
     shedule_plan = await database.fetch_one(query)
@@ -50,7 +50,7 @@ async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
     return ShedulePlan(code = shedule_plan.code,recruitment_year = shedule_plan.recruitment_year,form = shedule_plan.education_form,period = shedule_plan.period,oop=oop, disciplines=[])
 """
 #переписать
-@shedule_plan_router.post("/api/v1/shedule/plan/create/", summary="Создать новый учебный план")
+@shedule_plan_router.post("/shedule/plan/create/", summary="Создать новый учебный план")
 async def add_shedule_plan(item:ShedulePlanTableRecord):
     query = """INSERT INTO "ShedulePlan" (code, recruitment_year, education_form, period) 
     SELECT :code, :recruitment_year, :education_form, :period
@@ -70,7 +70,7 @@ async def add_shedule_plan(item:ShedulePlanTableRecord):
 
     return item
 
-@shedule_plan_router.post("/api/v1/shedule/plan/add/discipline/", summary="Добавить в учебный план дисциплину")
+@shedule_plan_router.post("/shedule/plan/add/discipline/", summary="Добавить в учебный план дисциплину")
 async def add_dicsipline_to_plan(item:DisciplinesInShedulePlan, shedule_plan_id:int) -> ShedulePlan:
     
     query = disciplines_table.select().where(disciplines_table.c.name == item.name)
@@ -116,7 +116,7 @@ async def add_dicsipline_to_plan(item:DisciplinesInShedulePlan, shedule_plan_id:
 #дописать возвращение в json списка элементов
 
 #переписать
-@shedule_plan_router.post("/api/v1/shedule/plan/export/", summary="Загрузить учебный план из json НЕ ДОДЕЛАННО")
+@shedule_plan_router.post("/shedule/plan/export/", summary="Загрузить учебный план из json НЕ ДОДЕЛАННО")
 async def add_shedule_plan(item:ShedulePlan) -> ShedulePlan: 
 
     query = """INSERT INTO "OOP" (code, direction, eduction_profile,education_level) 
