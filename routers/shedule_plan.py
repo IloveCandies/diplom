@@ -19,6 +19,7 @@ async def get_shedule_plan_by_id(shedule_plan_id: int) -> Union[ShedulePlan,None
     if shedule_plan == None:
         return None
     else:
+        print(shedule_plan.education_form)
         query = oop_table.select().where(oop_table.c.id == shedule_plan.oop)   
         oop_detail = await database.fetch_one(query)
         print(shedule_plan.education_form.value)

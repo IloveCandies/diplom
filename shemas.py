@@ -57,7 +57,7 @@ class ShedulePlan(BaseModel):
     code:str
     recruitment_year:datetime.date
     oop: Union[None, OOP] 
-    form:Education_form
+    form:Union[Education_form,str] = Education_form.Очная
     period:int
     disciplines:Union[List, List[DisciplinesInShedulePlan]] =[]
     
