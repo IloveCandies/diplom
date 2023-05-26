@@ -1,7 +1,7 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, File, UploadFile
+from typing import Annotated
 test_router = APIRouter()
 from shemas import *
-from mock_data import *
 
 
 @test_router.get("/",tags=["test","qwqw"])
@@ -15,3 +15,12 @@ async def login(email:str,password:str) -> Student :
         #хэш анхэш
         if (student.email == email) and (student.password == password):
             return student
+
+@test_router.post("/files/")
+async def create_file(file: Annotated[bytes, File()]):
+    return {"file_size": len(file)}
+
+
+@test_router.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}

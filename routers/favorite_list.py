@@ -33,7 +33,7 @@ async def update_comment(favorite_list_item_id,favorite_list_id,group_id,message
     await database.execute(update_comment_query)
 
 @favorite_list_router.post("/api/v1/favorites/add/", summary="Добавить в список избранного НЕ ДОДЕЛАННО")
-async def add_group_to_favorites(group_name:str, response: Response,request: Request, 
+async def add_group_to_favorites(group_name:str, response: Response, request: Request, 
                                  message:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой"):
     
     user_id = int(request.cookies.get("user_id"))

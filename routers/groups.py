@@ -5,9 +5,37 @@ from db.models import group_table, shedule_plan_table, oop_table
 from db.init import database
 from fastapi.responses import JSONResponse
 from middleware.jwt import *
-from .oop import get_oop
-from .shedule_plan import get_shedule_plan
-group_router = APIRouter(responses={404: {"model": Message},400: {"model": Message}})
+
+from .shedule_plan import get_shedule_plan_by_id
+group_router = APIRouter(responses={404: {"model": Message},400: {"model": Message}, 401: {"model": Message}} )
+
+async def get_group_by_shedule_plan_id(shedule_plan_id:int) ->GroupDetail: 
+    query = group_table.select().where(group_table.c.shedule_plan == shedule_plan_id)
+    group = await database.fetch_one(query)
+    shedule_plan = await get_shedule_plan_by_id(shedule_plan_id)
+    if shedule_plan == None:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+    else:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}
+
+async def get_group_by_id(id:int) ->GroupDetail: 
+    query = group_table.select().where(group_table.c.id == id)
+    group = await database.fetch_one(query)
+    shedule_plan = await get_group_by_shedule_plan_id(group["shedule_plan"])
+   
+    if shedule_plan == None:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+    else:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}    
+
 
 @group_router.post("/api/v1/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
 async def add_group(item: Group) -> Group: 
@@ -27,31 +55,23 @@ async def add_group(item: Group) -> Group:
 async def get_group(group_name:str) ->GroupDetail: 
     query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(query)
-    shedule_plan = await get_shedule_plan(group["shedule_plan"])
+    shedule_plan = await get_group_by_shedule_plan_id(group["shedule_plan"])
     print(shedule_plan)
-    return {
-            "name":group["name"],
-            "year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],
-            "potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"],
-            "shedule_plan":shedule_plan}
+    if shedule_plan == None:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+    else:
+        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
+            "available_places":group["available_places"],"potential_places":group["potential_places"],
+            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}
 
-async def get_group_by_id(id:int) ->GroupDetail: 
-    query = group_table.select().where(group_table.c.id == id)
-    group = await database.fetch_one(query)
-    shedule_plan = await get_shedule_plan(group["shedule_plan"])
-    return {
-            "name":group["name"],
-            "year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],
-            "potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"],
-            "shedule_plan":shedule_plan}
+
+
 
 
 @group_router.get("/api/v1/groups/", summary="Получить данные всех групп")
-async def get_groups() -> List[GroupDetail]: 
+async def get_groups(): 
     query = group_table.select()
     groups = await database.fetch_all(query)
     print(groups)
@@ -109,12 +129,6 @@ odd_responses = {
 async def get_groups(token:JwtAuthorizationCredentials = Security(access_security)) -> List[Group]: 
     query = group_table.select()
     return await database.fetch_all(query)
-
-#подумать как делать
-@group_router.post("/api/v1/group/add/plan/", summary="Добавить план в группу  НЕ ДОДЕЛАННО")
-async def add_shedule_plan(shedule_plan_id:int) -> Group: 
-    return GroupTableRecord
-
 
 @group_router.post("/api/v1/group/detail/", summary="Детали группы НЕ ДОДЕЛАННО")
 async def add_group(item: Group) -> GroupDetail: 

@@ -59,6 +59,7 @@ student_education_table = Table(
     metadata,
     Column("id", Integer, primary_key=True, index=True),
     Column("oop_id",Integer, ForeignKey("OOP.id")),
+    Column("сourse",Integer),
     Column("education_form", Enum(Education_form)),
     Column("period", Integer)
 )
@@ -97,8 +98,8 @@ student_table = Table(
     Column("first_name",String),
     Column("middle_name", String),
     Column("last_name", String),
-    Column("phone", String,),
-    Column("email",String),
+    Column("phone", String, unique = True),
+    Column("email",String, unique = True),
     Column("password", String),
     Column("salt", String),
     

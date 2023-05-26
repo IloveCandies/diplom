@@ -4,6 +4,8 @@ from db.models import staff_table, student_table
 from fastapi.responses import JSONResponse
 from db.init import database
 from middleware import hashing
+from asyncpg.exceptions import UniqueViolationError
+from sqlite3 import IntegrityError
 from middleware.jwt import *
 
 
@@ -15,8 +17,10 @@ auth_router = APIRouter (
 @auth_router.post("/api/v1/sign_up/staff/", summary="")
 async def auth(response: Response,request: Request, login_data:LoginData ): 
     values = { "first_name":login_data.first_name,"middle_name":login_data.middle_name, 
-    "last_name":login_data.last_name,"phone":login_data.phone, "email":login_data.email }
-    
+                "last_name":login_data.last_name,
+                "phone":login_data.phone, "email":login_data.email 
+            }
+
     password, salt = await hashing.encode_password(login_data.password)
     values["password"],values["salt"] = password, salt 
     token = access_security.create_access_token(subject=values)
@@ -25,17 +29,18 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
     query = """INSERT INTO "UniversityStaff" (first_name, last_name, middle_name,
     phone, email, password, salt, api_token) 
     SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt, :api_token
-    WHERE
-    NOT EXISTS (
-    SELECT CAST(:phone AS VARCHAR) FROM "UniversityStaff" WHERE phone = :phone) 
     RETURNING  id"""
-    
-    id = await database.execute(query=query, values=values)
-    response.delete_cookie(key="access_token")
-    if id != None:
-        #response.set_cookie(key="access_token", value = values["api_token"])
-        return  {"message": "Come to the dark side, we have cookies", "access_token":request.cookies.get('access_token'), "values":values}
+
+    try:
+        await database.execute(query=query, values=values)
+        return True
+    except IntegrityError:
+        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+    except UniqueViolationError:
+        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
     return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+
+    
 
 @auth_router.post("/api/v1/sign_up/student/", summary="")
 async def auth(response: Response,request: Request, login_data:LoginData ): 
@@ -48,15 +53,15 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
     query = """INSERT INTO "Student" (first_name, last_name, middle_name,
     phone, email, password, salt) 
     SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt
-    WHERE
-    NOT EXISTS (
-    SELECT CAST(:phone AS VARCHAR ) FROM "Student" WHERE phone = :phone)
     RETURNING  id"""
     
-    id = await database.execute(query=query, values=values)
-    if id != None:
+    try:
+        await database.execute(query=query, values=values)
         return True
-    return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+    except IntegrityError:
+        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+    except UniqueViolationError:
+        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
 
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()

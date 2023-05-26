@@ -2,8 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 #
-from routers.groups import group_router
-from routers.user import user_router 
+from routers.groups import group_router 
 from routers.university import university_router 
 from routers.oop import oop_router 
 from routers.shedule_plan import shedule_plan_router
@@ -15,6 +14,7 @@ from routers.student import student_router
 from routers.favorite_list import favorite_list_router
 from routers.discipline import discipline_router
 from routers.auth import auth_router
+from routers.test import test_router
 #
 from db.init import database
 from fastapi_offline import FastAPIOffline
@@ -30,8 +30,8 @@ async def not_found_error(request: Request, exc: HTTPException):
     return RedirectResponse('https://fastapi.tiangolo.com')
 
 exception_handlers = {404: not_found_error}
-
-app = FastAPI(exception_handlers=exception_handlers, root_path = "/api/v1")
+# root_path = "/api/v1"
+app = FastAPI(exception_handlers=exception_handlers, )
 origins = ["*"]
 
 app.add_middleware(
@@ -66,7 +66,7 @@ app.include_router(student_router,tags=["Студенты в РАЗРАБОТК�
 app.include_router(university_router,tags=["Методы ВУЗА ПОКА НЕ РЕАЛИЗОВАННЫ "])
 app.include_router(student_education_disciplines_router,tags=["Дисциплины студентов ПОКА НЕ РЕАЛИЗОВАННЫ "])
 app.include_router(university_staff_router,tags=["Сотрудники ПОКА НЕ РЕАЛИЗОВАННЫ"])
-
+app.include_router(test_router,tags=["ТЕСТ"])
   
   
 

@@ -103,11 +103,14 @@ class Region():
     number:int
     name:str
 
-@dataclass
-class Sity():
+class CityTableRecord(BaseModel):
     id:int
-    region: Region
-    name:str
+    region: int
+    name:str = ""
+
+class City(BaseModel):
+    region: Union[Region,None] = None
+    name:str = ""
 
 @dataclass
 class Education():
@@ -149,7 +152,7 @@ class UniversityStaffRecord(BaseModel):
 class University(BaseModel):
     id:int
     name: str
-    sity: Sity
+    сity: City
     description: Union[str, None] = None
     university_staff: Union[List[UniversityStaff], None] = None
         
@@ -224,16 +227,26 @@ class StudentTableRecord(BaseModel):
     favorite_list: int
 
 class Student(BaseModel):
+    first_name:str = " "
+    middle_name:str = " "
+    last_name:str = " "
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    сity: Union[City,None] = None
+ 
+
+class StudentData(BaseModel):
     first_name:str
     middle_name:str
     last_name:str
-    phone:str = "8-800-555-35-35"
-    email:str = "default@mail.com"
-    password:str
-    sity: Union[Sity,None] = None
-    education:Union[List[StudentEducation],None] = None
-    favorite_list: Union[FavoriteList,None] = None 
-    
+    phone:str = ""
+
+class StudentData(BaseModel):
+    first_name:str
+    middle_name:str
+    last_name:str
+    phone:str = ""
+
 class Item(BaseModel):
     id: str
     value: str

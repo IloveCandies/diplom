@@ -1,7 +1,7 @@
 from asyncpg import exceptions
 from fastapi import APIRouter
 from shemas import *
-from db.models import shedule_plan_table, oop_table,disciplines_table,disciplines_in_shedule_plan_table
+from db.models import shedule_plan_table, oop_table,disciplines_table,disciplines_in_shedule_plan_table, group_table
 from db.init import database
 from fastapi.responses import JSONResponse
 
@@ -9,19 +9,21 @@ from fastapi.responses import JSONResponse
 shedule_plan_router = APIRouter( responses={404: {"description": "Not found"}})
 
 
-@shedule_plan_router.get("/api/v1/shedule/plan/", summary="Получить данные конкретного плана")
-async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
+async def get_shedule_plan_by_id(shedule_plan_id: int) -> Union[ShedulePlan,None]:
     query = disciplines_in_shedule_plan_table.select().where(disciplines_in_shedule_plan_table.c.shedule_plan == shedule_plan_id)
 
     disciplines_in_plan = [ tuple(item.values())[0:3] for item  in await database.fetch_all(query)]
     query = shedule_plan_table.select().where(shedule_plan_table.c.id == shedule_plan_id)
     shedule_plan = await database.fetch_one(query)
     
-    query = oop_table.select().where(oop_table.c.id ==shedule_plan.oop)
-    oop_detail = await database.fetch_one(query)
-    return ShedulePlan( code = shedule_plan.code,
+    if shedule_plan == None:
+        return None
+    else:
+        query = oop_table.select().where(oop_table.c.id == shedule_plan.oop)   
+        oop_detail = await database.fetch_one(query)
+        return ShedulePlan( code = shedule_plan.code,
                         recruitment_year = shedule_plan.recruitment_year,
-                        form = Education_form [shedule_plan.education_form],
+                        form = shedule_plan.education_form,
                         period = shedule_plan.period,
                         oop = OOP(code=oop_detail["code"],direction=oop_detail["direction"],
                                 eduction_profile=oop_detail["eduction_profile"],
@@ -29,13 +31,27 @@ async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
                         ,disciplines = disciplines_in_plan)
 
 
+#    disciplines_in_plan = [ tuple(item.values())[0:3] for item  in await database.fetch_all(query)]
+#  query = oop_table.select().where(oop_table.c.id == shedule_plan.oop)
 
+#oop = OOP(code=oop_detail["code"],direction=oop_detail["direction"],
+#                                eduction_profile=oop_detail["eduction_profile"],
+#                                education_level=oop_detail["education_level"])
+#                        ,disciplines = [])
+# oop_detail = await database.fetch_one(query)
 
+"""shedule_plan_router.get("/api/v1/shedule/plan/", summary="Получить данные конкретного плана")
+async def get_shedule_plan(shedule_plan_id: int) -> ShedulePlan:
+    query = shedule_plan_table.select().where(shedule_plan_table.c.code == shedule_plan_id)
+    shedule_plan = await database.fetch_one(query)
+    oop = await get_group_by_shedule_plan_id(shedule_plan_id) 
+    return ShedulePlan(code = shedule_plan.code,recruitment_year = shedule_plan.recruitment_year,form = shedule_plan.education_form,period = shedule_plan.period,oop=oop, disciplines=[])
+"""
 #переписать
 @shedule_plan_router.post("/api/v1/shedule/plan/create/", summary="Создать новый учебный план")
-async def add_shedule_plan(item:ShedulePlanTableRecord) -> ShedulePlanTableRecord:
-    query = """INSERT INTO "ShedulePlan" (code, recruitment_year, education_form, period,oop) 
-    SELECT :code, :recruitment_year, :education_form, :period, :oop
+async def add_shedule_plan(item:ShedulePlanTableRecord):
+    query = """INSERT INTO "ShedulePlan" (code, recruitment_year, education_form, period) 
+    SELECT :code, :recruitment_year, :education_form, :period
     WHERE
     NOT EXISTS (
     SELECT CAST(:code AS VARCHAR) FROM "ShedulePlan" WHERE code = :code) 
@@ -164,7 +180,7 @@ async def add_shedule_plan(item:ShedulePlan) -> ShedulePlan:
 
 
 
-@shedule_plan_router.post("/shedule/plan/add/oop/", summary="Добавить в учебный план дисциплину")
+@shedule_plan_router.post("/shedule/plan/add/oop/", summary="Добавить в учебный план ООП")
 async def add_oop_to_plan(shedule_plan_code:str, oop_code:str) -> ShedulePlanDetail:
     query = oop_table.select().where(oop_table.c.code == oop_code)
     oop = await database.fetch_one(query)
@@ -181,7 +197,7 @@ async def add_oop_to_plan(shedule_plan_code:str, oop_code:str) -> ShedulePlanDet
             form= shedule_plan["education_form"],
             recruitment_year = shedule_plan["recruitment_year"],
             period =shedule_plan["period"],
-            oop = oop, disciplines = shedule_plan["disciplines"])
+            oop = oop, disciplines = [])
 
 
   
