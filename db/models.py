@@ -123,7 +123,7 @@ favorites_item_table = Table(
 )
 #удалить потом на проде
 metadata.drop_all(engine)
-metadata.create_all(engine)
+#metadata.create_all(engine)
 
 #Column("password", String),
 #Column("password", String),
