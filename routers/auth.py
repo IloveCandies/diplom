@@ -54,7 +54,6 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
     phone, email, password, salt) 
     SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt
     RETURNING  id"""
-    await database.execute(query=query, values=values)
     
     try:
         await database.execute(query=query, values=values)
