@@ -164,6 +164,16 @@ class Group(BaseModel):
     end_year:int
     shedule_plan_id:int
 
+
+# json учебного плана
+class GroupData(BaseModel):
+    year_of_recruitment:int
+    available_places:int
+    potential_places:int
+    course:int
+    end_year:int
+
+
 # json учебного плана
 class GroupDetail(BaseModel):
     name: str
@@ -250,5 +260,8 @@ class Item(BaseModel):
     value: str
 
 
+
+
 class Message(BaseModel):
+    datetime:datetime.datetime
     message: str

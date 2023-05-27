@@ -13,14 +13,16 @@ async def get_group_by_shedule_plan_id(shedule_plan_id:int) ->GroupDetail:
     query = group_table.select().where(group_table.c.shedule_plan == shedule_plan_id)
     group = await database.fetch_one(query)
     shedule_plan = await get_shedule_plan_by_id(shedule_plan_id)
+    
     if shedule_plan == None:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
     else:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 
+
 
 async def get_group_by_id(id:int) ->GroupDetail: 
     query = group_table.select().where(group_table.c.id == id)
@@ -28,13 +30,13 @@ async def get_group_by_id(id:int) ->GroupDetail:
     shedule_plan = await get_group_by_shedule_plan_id(group["shedule_plan"])
    
     if shedule_plan == None:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":None}
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
     else:
-        return {"name":group["name"],"year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],"potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"], "shedule_plan":shedule_plan}    
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 
 
 
 @group_router.post("/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
@@ -51,12 +53,13 @@ async def add_group(item: Group) -> Group:
         "msg": "Группа с таким именем уже существует "}})
     return item
 
-@group_router.get("/group/", summary="Получить данные конкретной группы по id")
+@group_router.get("/group/", summary="Получить данные конкретной группы по названию")
 async def get_group(group_name:str) ->GroupDetail: 
     query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(query)
+    if group == None:
+      return JSONResponse(status_code=404, content = {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"message":"Группа с таким названием не найдена"})
     shedule_plan = await get_shedule_plan_by_id(group["shedule_plan"])
-    print(shedule_plan)
     if shedule_plan == None:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
@@ -65,8 +68,6 @@ async def get_group(group_name:str) ->GroupDetail:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
                            course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan)
-
-
 
 
 
@@ -101,13 +102,10 @@ async def add_plan(shedule_plan_code:str, group_name:str) -> GroupDetail:
                                             eduction_profile=oop_detail["eduction_profile"],
                                             education_level=oop_detail["education_level"]),
                                     disciplines=[])
-    return {
-            "name":group["name"],
-            "year_of_recruitment":group["year_of_recruitment"],
-            "available_places":group["available_places"],
-            "potential_places":group["potential_places"],
-            "course":group["course"], "end_year":group["end_year"],
-            "shedule_plan":shedule_plan_detail}
+    return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan_detail)
+
 
 odd_responses = {
     404: {
@@ -125,20 +123,18 @@ odd_responses = {
     },
 }
 
-@group_router.get("/groups/test-token/", summary="Получить данные всех групп | ТЕСТ ЗАПРОСА ТОКЕНА")
-async def get_groups(token:JwtAuthorizationCredentials = Security(access_security)) -> List[Group]: 
-    query = group_table.select()
-    return await database.fetch_all(query)
-
-@group_router.post("/group/detail/", summary="Детали группы НЕ ДОДЕЛАННО")
-async def add_group(item: Group) -> GroupDetail: 
-    return item
-
-@group_router.patch("/group/path/", summary="Обновить данные группы, взятой по id  НЕ СДЕЛАННО")
-async def path_group(id): 
-    return False
    
 @group_router.delete("/group/delete/", summary="Удалить групу, взятую по id  НЕ СДЕЛАННО")
-async def delete_group(id) -> Group: 
-    return Group
+async def delete_group(group_name:str) -> bool: 
+    query = group_table.delete().where( group_table.c.name == group_name)
+    await database.execute(query)
+    return True
 
+@group_router.patch("/group/path/", summary="Обновить данные группы, взятой по id  НЕ СДЕЛАННО")
+async def path_group(group_name:str, group_data: GroupData) ->bool: 
+    query = group_table.update().values( year_of_recruitment = group_data.year_of_recruitment, 
+                                        available_places = group_data.available_places,
+                                        potential_places = group_data.potential_places, course = group_data.course, 
+                                        end_year = group_data.end_year).where(group_table.c.name == group_name )
+    await database.execute(query)
+    return True
