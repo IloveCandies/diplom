@@ -121,6 +121,8 @@ favorites_item_table = Table(
     Column("message", String),
     
 )
+#удалить потом на проде
+metadata.drop_all(engine)
 metadata.create_all(engine)
 
 #Column("password", String),
