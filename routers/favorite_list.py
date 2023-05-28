@@ -6,13 +6,14 @@ from db.models import favorites_item_table, favorites_table, group_table, studen
 from .groups import get_group,get_group_by_id
 favorite_list_router = APIRouter()
 
-async def get_list(user_id):
+async def get_list_id(user_id):
     query =  favorites_table.select().where(favorites_table.c.student == user_id)
-    return await database.execute(query)
+    favorite_list = await database.fetch_one(query)
+    return favorite_list["id"]
 
 async def get_all_items_details(user_id) -> FavoriteList:
     user_favorite_list = FavoriteList(groups=[])
-    user_favorite_list_id = await get_list(user_id)
+    user_favorite_list_id = await get_list_id(user_id)
     query =  favorites_item_table.select().where(favorites_item_table.c.favorite_list_id == user_favorite_list_id)
     answ = await database.fetch_all(query)
     for item in answ:
@@ -43,6 +44,11 @@ async def add_group_to_favorites(group_name:str, response: Response, request: Re
     group_query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(group_query)
     group_id = group["id"]
+    
+    if group_id == None:
+        return JSONResponse(status_code=400, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Группа с таким именем не существует "}})
     
     item_query  = """INSERT INTO "FavoriteItem" (favorite_list_id, group_id, message)
                         SELECT :favorite_list_id, :group_id, :message
@@ -77,11 +83,15 @@ async def add_group_to_favorites(group_name:str, response: Response, request: Re
 @favorite_list_router.get("/favorites/")
 async def get_favorites(request: Request) -> FavoriteList: 
     user_id = int(request.cookies.get("user_id"))
+    print(user_id)
     user_favorite_list = FavoriteList(groups=[])
-    user_favorite_list_id = await get_list(user_id)
+    user_favorite_list_id = await get_list_id(user_id)
+    print(user_favorite_list_id)
     query =  favorites_item_table.select().where(favorites_item_table.c.favorite_list_id == user_favorite_list_id)
     answ = await database.fetch_all(query)
+    print(answ)
     for item in answ:
+        print(item)
         group = await get_group_by_id(item["group_id"])
         user_favorite_list.groups.append(StudentFavoriteListItem(group = group, message = item["message"]))
     print(user_favorite_list)

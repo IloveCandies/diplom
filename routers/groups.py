@@ -5,26 +5,14 @@ from db.models import group_table, shedule_plan_table, oop_table
 from db.init import database
 from fastapi.responses import JSONResponse
 from middleware.jwt import *
+from sqlite3 import IntegrityError
 
 from .shedule_plan import get_shedule_plan_by_id
-group_router = APIRouter(responses={404: {"model": Message},400: {"model": Message}, 401: {"model": Message}} )
-
-async def get_group_by_shedule_plan_id(shedule_plan_id:int) ->GroupDetail: 
-    query = group_table.select().where(group_table.c.shedule_plan == shedule_plan_id)
-    group = await database.fetch_one(query)
-    shedule_plan = await get_shedule_plan_by_id(shedule_plan_id)
-    
-    if shedule_plan == None:
-        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
-                           available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
-    else:
-        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
-                           available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 
+group_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 409: {"model": Message}})
 
 
-async def get_group_by_id(id:int) ->GroupDetail: 
+
+async def get_group_by_id(id:int) -> GroupDetail: 
     query = group_table.select().where(group_table.c.id == id)
     group = await database.fetch_one(query)
     shedule_plan = await get_group_by_shedule_plan_id(group["shedule_plan"])
@@ -48,9 +36,13 @@ async def add_group(item: Group) -> Group:
     try:
         await database.execute(query)
     except (exceptions.UniqueViolationError):
-        return JSONResponse(status_code=400, content = {"detail":
-        {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
-        "msg": "Группа с таким именем уже существует "}})
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Группа с таким именем уже существует "}})
+    except IntegrityError:
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Группа с таким именем уже существует "}})     
     return item
 
 @group_router.get("/group/", summary="Получить данные конкретной группы по названию")
