@@ -6,9 +6,6 @@ from routers.groups import group_router
 from routers.university import university_router 
 from routers.oop import oop_router 
 from routers.shedule_plan import shedule_plan_router
-from routers.disciplines_in_shedule_plan import shedule_plan_disciplines_router
-from routers.disciplines_in_student_education import student_education_disciplines_router
-from routers.student_education import student_education_router
 from routers.university_staff import university_staff_router
 from routers.student import student_router
 from routers.favorite_list import favorite_list_router

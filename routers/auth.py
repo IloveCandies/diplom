@@ -10,7 +10,7 @@ from middleware.jwt import *
 
 
 
-auth_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 409: {"model": Message}})
+auth_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 422: {"model": Message}})
 
 
 @auth_router.post("/sign_up/staff/", summary="")
@@ -34,11 +34,11 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
         await database.execute(query=query, values=values)
         return True
     except IntegrityError:
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователь с таким телефоном или почтой уже существует"}})
     except UniqueViolationError:
-        return  JSONResponse(status_code=409, content = {"detail":
+        return  JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователь с таким телефоном или почтой уже существует"}})
    
@@ -61,11 +61,11 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
         await database.execute(query=query, values=values)
         return True
     except IntegrityError:
-        return  JSONResponse(status_code=409, content = {"detail":
+        return  JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователь с таким телефоном или почтой уже существует"}})
     except UniqueViolationError:
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователь с таким телефоном или почтой уже существует"}})
 
@@ -76,7 +76,7 @@ async def sign_in(email:str, password:str)->UniversityStaffRecord:
     query = staff_table.select().where(staff_table.c.email == email)
     staff = await database.fetch_one(query)
     if staff == None:
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователя с таким именем не существует "}})
 
@@ -92,7 +92,7 @@ async def sign_in(email:str, password:str, response: Response)->Student:
     student = await database.fetch_one(query)
 
     if student == None:
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователя с таким именем не существует "}})
     if await hashing.check_password(password,student["password"],student["salt"]) == True:

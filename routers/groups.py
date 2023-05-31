@@ -7,8 +7,8 @@ from fastapi.responses import JSONResponse
 from middleware.jwt import *
 from sqlite3 import IntegrityError
 
-from .shedule_plan import get_shedule_plan_by_id
-group_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 409: {"model": Message}})
+from .shedule_plan import get_shedule_plan_by_id, get_shedule_plan_disciplines
+group_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 422: {"model": Message}})
 
 async def get_group_by_shedule_plan_id(shedule_plan_id:int) ->GroupDetail: 
     query = group_table.select().where(group_table.c.shedule_plan == shedule_plan_id)
@@ -49,30 +49,15 @@ async def add_group(item: Group) -> Group:
     try:
         await database.execute(query)
     except (exceptions.UniqueViolationError):
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Группа с таким именем уже существует "}})
     except IntegrityError:
-        return JSONResponse(status_code=409, content = {"detail":
+        return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Группа с таким именем уже существует "}})     
     return item
 
-@group_router.get("/group/", summary="Получить данные конкретной группы по названию")
-async def get_group(group_name:str) ->GroupDetail: 
-    query = group_table.select().where(group_table.c.name == group_name)
-    group = await database.fetch_one(query)
-    if group == None:
-      return JSONResponse(status_code=404, content = {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"message":"Группа с таким названием не найдена"})
-    shedule_plan = await get_shedule_plan_by_id(group["shedule_plan"])
-    if shedule_plan == None:
-        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
-                           available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
-    else:
-        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
-                           available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan)
 
 
 
@@ -97,11 +82,18 @@ async def add_plan(shedule_plan_code:str, group_name:str) -> GroupDetail:
         return JSONResponse(status_code=422, content = {"description": "Учебный план не существует чтобы создать дисциплину воспользуйтесь методом /disciplines/create/"})
     await database.execute(query)
 
+
+
     query = group_table.select().where(group_table.c.name == group_name)
     group = await database.fetch_one(query)
     query = oop_table.select().where(oop_table.c.id == shedule_plan["oop"])
     oop_detail = await  database.fetch_one(query)
-    shedule_plan_detail = ShedulePlan(code=shedule_plan["code"], recruitment_year = shedule_plan["recruitment_year"],
+    if oop_detail == None:
+         shedule_plan_detail = ShedulePlan(code=shedule_plan["code"], recruitment_year = shedule_plan["recruitment_year"],
+                                    form = shedule_plan["education_form"],period=shedule_plan["period"],
+                                    oop = None)
+    else:
+        shedule_plan_detail = ShedulePlan(code=shedule_plan["code"], recruitment_year = shedule_plan["recruitment_year"],
                                     form = shedule_plan["education_form"],period=shedule_plan["period"],
                                     oop = OOP(code=oop_detail["code"],direction=oop_detail["direction"],
                                             eduction_profile=oop_detail["eduction_profile"],
@@ -110,6 +102,30 @@ async def add_plan(shedule_plan_code:str, group_name:str) -> GroupDetail:
     return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
                            course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan_detail)
+
+
+
+
+@group_router.get("/group/", summary="Получить данные конкретной группы по названию")
+async def get_group(group_name:str) ->GroupDetail: 
+    query = group_table.select().where(group_table.c.name == group_name)
+    group = await database.fetch_one(query)
+    if group == None:
+      return JSONResponse(status_code=404, content = {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),"message":"Группа с таким названием не найдена"})
+    shedule_plan = await get_shedule_plan_by_id(group["shedule_plan"])
+    
+    if shedule_plan == None:
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
+    else:
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan)
+
+
+
+
 
 
 odd_responses = {
