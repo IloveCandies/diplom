@@ -99,7 +99,9 @@ async def sign_in(email:str, password:str, response: Response)->Student:
         response.set_cookie(key="user_id", value = student["id"])    
         return student
     else:
-        return student["password"]
+        return JSONResponse(status_code=422, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Неверный пароль"}})
 
 @auth_router.post("/logout/", summary="")
 async def logout() -> UniversityStaff: 

@@ -4,7 +4,9 @@ from asyncpg import exceptions
 from db.init import database
 from db.models import favorites_item_table, favorites_table, group_table, student_table
 from .groups import get_group,get_group_by_id
-favorite_list_router = APIRouter()
+from fastapi.responses import JSONResponse
+
+favorite_list_router =  APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 422: {"model": Message}})
 
 async def get_list_id(user_id):
     query =  favorites_table.select().where(favorites_table.c.student == user_id)
@@ -33,9 +35,9 @@ async def update_comment(favorite_list_item_id,favorite_list_id,group_id,message
         and(favorites_item_table.c.group_id == group_id))
     await database.execute(update_comment_query)
 
-@favorite_list_router.post("/favorites/add/", summary="Добавить в список избранного НЕ ДОДЕЛАННО")
+@favorite_list_router.post("/favorites/add/", summary="Добавить группу в список избранного")
 async def add_group_to_favorites(group_name:str, response: Response, request: Request, 
-                                 message:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой"):
+                                 message:str = "Вот мой сопроводительный текст: Хочу на бюджет потому что я крутой") -> bool:
     
     user_id = int(request.cookies.get("user_id"))
     
@@ -61,7 +63,7 @@ async def add_group_to_favorites(group_name:str, response: Response, request: Re
         
         await database.execute(group_query)
         await database.execute(item_query,values={"favorite_list_id":favorite_list_id,"group_id":group_id,"message":message,})
-        return "1"
+        return True
     
     except (exceptions.UniqueViolationError):
         query = favorites_table.select().where(favorites_table.c.student == user_id)
@@ -93,6 +95,7 @@ async def get_favorites(request: Request) -> FavoriteList:
     for item in answ:
         print(item)
         group = await get_group_by_id(item["group_id"])
+        print(group)
         user_favorite_list.groups.append(StudentFavoriteListItem(group = group, message = item["message"]))
     print(user_favorite_list)
     print(type(user_favorite_list))
