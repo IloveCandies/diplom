@@ -33,13 +33,14 @@ class OOPTableRecord():
     education_level:Education_level
 
 @dataclass
-class Discipline():
+class Discipline(BaseModel):
     name:str
 
 @dataclass
 class DisciplineTableRecord():
     id:int
     name:str
+    
 @dataclass
 class DisciplinesInShedulePlanTablerecord():
     id:int

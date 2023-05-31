@@ -21,7 +21,7 @@ async def create(discipline_name: str) -> DisciplineTableRecord:
         return JSONResponse(status_code=422, content = {"description": "Дисциплина уже существует"})
     return DisciplineTableRecord(id = discipline, name=discipline_name)
 
-@discipline_router.get("/discipline/", summary="Получить данные дисциплины")
+@discipline_router.get("/discipline/", summary="Получить данные дисциплины / добавить обработку исключений")
 async def get_dicsipline(id:int) -> DisciplineTableRecord:
     query = disciplines_table.select().where(disciplines_table.c.id == id) 
     return await database.fetch_one(query)
@@ -31,7 +31,7 @@ async def get_dicsiplines() ->List[DisciplineTableRecord]:
     query = disciplines_table.select()
     return await database.fetch_all(query)
   
-@discipline_router.delete("/discipline/delete/", summary="Удалить дисциплину")
+@discipline_router.delete("/discipline/delete/", summary="Удалить дисциплину / доделать")
 async def delete_shedule_plan(id) -> bool: 
     return True
 

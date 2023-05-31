@@ -10,6 +10,19 @@ from sqlite3 import IntegrityError
 from .shedule_plan import get_shedule_plan_by_id
 group_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 409: {"model": Message}})
 
+async def get_group_by_shedule_plan_id(shedule_plan_id:int) ->GroupDetail: 
+    query = group_table.select().where(group_table.c.shedule_plan == shedule_plan_id)
+    group = await database.fetch_one(query)
+    shedule_plan = await get_shedule_plan_by_id(shedule_plan_id)
+    
+    if shedule_plan == None:
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
+    else:
+        return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
+                           available_places=group["available_places"], potential_places=group["potential_places"],
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 
 
 
 async def get_group_by_id(id:int) -> GroupDetail: 
@@ -116,13 +129,13 @@ odd_responses = {
 }
 
    
-@group_router.delete("/group/delete/", summary="Удалить групу, взятую по id  НЕ СДЕЛАННО")
+@group_router.delete("/group/delete/", summary="Удалить групу, взятую по названию")
 async def delete_group(group_name:str) -> bool: 
     query = group_table.delete().where( group_table.c.name == group_name)
     await database.execute(query)
     return True
 
-@group_router.patch("/group/path/", summary="Обновить данные группы, взятой по id  НЕ СДЕЛАННО")
+@group_router.patch("/group/path/", summary="Обновить данные группы")
 async def path_group(group_name:str, group_data: GroupData) ->bool: 
     query = group_table.update().values( year_of_recruitment = group_data.year_of_recruitment, 
                                         available_places = group_data.available_places,

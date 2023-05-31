@@ -10,8 +10,7 @@ from middleware.jwt import *
 
 
 
-auth_router = APIRouter (
-    responses={404: {"description": "Not found"}})
+auth_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 409: {"model": Message}})
 
 
 @auth_router.post("/sign_up/staff/", summary="")
@@ -35,11 +34,14 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
         await database.execute(query=query, values=values)
         return True
     except IntegrityError:
-        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователь с таким телефоном или почтой уже существует"}})
     except UniqueViolationError:
-        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
-    return {"message": "Пользователь с таким телефоном или почтой уже существует"}
-
+        return  JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователь с таким телефоном или почтой уже существует"}})
+   
     
 
 @auth_router.post("/sign_up/student/", summary="")
@@ -59,9 +61,13 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
         await database.execute(query=query, values=values)
         return True
     except IntegrityError:
-        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+        return  JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователь с таким телефоном или почтой уже существует"}})
     except UniqueViolationError:
-        return {"message": "Пользователь с таким телефоном или почтой уже существует"}
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователь с таким телефоном или почтой уже существует"}})
 
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
@@ -69,6 +75,11 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
 async def sign_in(email:str, password:str)->UniversityStaffRecord: 
     query = staff_table.select().where(staff_table.c.email == email)
     staff = await database.fetch_one(query)
+    if staff == None:
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователя с таким именем не существует "}})
+
     if await hashing.check_password(password,staff["password"],staff["salt"]) == True:
         return staff
     else:
@@ -79,6 +90,11 @@ async def sign_in(email:str, password:str)->UniversityStaffRecord:
 async def sign_in(email:str, password:str, response: Response)->Student: 
     query = student_table.select().where(student_table.c.email == email)
     student = await database.fetch_one(query)
+
+    if student == None:
+        return JSONResponse(status_code=409, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Пользователя с таким именем не существует "}})
     if await hashing.check_password(password,student["password"],student["salt"]) == True:
         response.set_cookie(key="user_id", value = student["id"])    
         return student
@@ -88,12 +104,6 @@ async def sign_in(email:str, password:str, response: Response)->Student:
 @auth_router.post("/logout/", summary="")
 async def logout() -> UniversityStaff: 
     return UniversityStaff
-
-async def refresh_token (token:JwtAuthorizationCredentials = Security(access_security)) -> UniversityStaffRecord:
-    query = staff_table.select().where(staff_table.c.api_token == token)
-    staff = await database.fetch_one(query)
-    return staff   
-
 
 @auth_router.get("/refresh/token", summary="")
 async def whoami(): 

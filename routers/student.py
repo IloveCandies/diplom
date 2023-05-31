@@ -1,10 +1,9 @@
-
 from fastapi import APIRouter, Depends, Response,  Security, Request
 from shemas import *
 from asyncpg import exceptions
 from db.init import database
 from db.models import favorites_item_table, favorites_table, group_table, student_table
-from .groups import get_group,get_group_by_id
+from .groups import get_group
 
 student_router = APIRouter(responses={404: {"model": Message},400: {"model": Message}, 401: {"model": Message}} )
 

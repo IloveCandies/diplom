@@ -7,7 +7,7 @@ from db.init import database
 from fastapi.responses import JSONResponse
 oop_router = APIRouter( responses={404: {"description": "Not found"}})
 
-@oop_router.get("/oop/")
+@oop_router.get("/oop/", summary="/обработку исключений доделать", description="ddd")
 async def get_oop(id:int) -> OOPTableRecord:
     query = oop_table.select().where(oop_table.c.id == id)
     print(query)
@@ -39,7 +39,7 @@ async def create(item: OOP) -> OOP:
            return JSONResponse(status_code=422, content = {"description": "Обьект с таким кодом уже существует"})
         return item
 
-@oop_router.patch("/oop/path/")
+@oop_router.patch("/oop/path/", deprecated=True, summary="Переделать")
 async def update(item: OOPTableRecord) -> OOP:
     if item.code.isdigit() or item.direction.isdigit() == True:
         print(item.code.isdigit())

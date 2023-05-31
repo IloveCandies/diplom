@@ -31,7 +31,7 @@ async def not_found_error(request: Request, exc: HTTPException):
 
 exception_handlers = {404: not_found_error}
 # root_path = "/api/v1"
-app = FastAPI(exception_handlers=exception_handlers,root_path = "/api/v1" )
+app = FastAPI(exception_handlers=exception_handlers)
 origins = ["*"]
 
 app.add_middleware(
@@ -59,12 +59,10 @@ app.include_router(discipline_router,tags=["Дисциплины"])
 app.include_router(oop_router,tags=["ООП"])
 app.include_router(shedule_plan_router,tags=["Учебный план 90% сделано"])
 
-app.include_router(shedule_plan_disciplines_router,tags=["Дисциплины учебных планов В РАЗРАБОТКЕ 70% "])
 app.include_router(favorite_list_router,tags=["Список избранного студента"])
-app.include_router(student_router,tags=["Студенты в РАЗРАБОТКЕ 50%"])
+app.include_router(student_router,tags=["Студенты в РАЗРАБОТКЕ 80%"])
 
 app.include_router(university_router,tags=["Методы ВУЗА ПОКА НЕ РЕАЛИЗОВАННЫ "])
-app.include_router(student_education_disciplines_router,tags=["Дисциплины студентов ПОКА НЕ РЕАЛИЗОВАННЫ "])
 app.include_router(university_staff_router,tags=["Сотрудники ПОКА НЕ РЕАЛИЗОВАННЫ"])
 app.include_router(test_router,tags=["ТЕСТ"])
   
