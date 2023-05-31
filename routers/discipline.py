@@ -14,7 +14,7 @@ discipline_router = APIRouter (
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
 @discipline_router.post("/discipline/create/", summary="Добавить новую дисциплину")
 async def create(discipline_name: str) -> DisciplineTableRecord:
-    query = await disciplines_table.insert().values(name = discipline_name)
+    query = disciplines_table.insert().values(name = discipline_name)
     try:
         discipline = await database.execute(query)
     except (exceptions.UniqueViolationError):

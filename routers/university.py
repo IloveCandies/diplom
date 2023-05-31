@@ -7,6 +7,30 @@ university_router = APIRouter()
 async def add_university() -> University: 
     return University
 
+@university_router.post("/university/add/city", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
+@university_router.post("/university/remove/city", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
+@university_router.post("/university/add/group", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
+@university_router.post("/university/remove/group", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
+@university_router.post("/university/add/staff", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
+@university_router.post("/university/remove/staff", summary="Добавить новый университета")
+async def add_university() -> University: 
+    return University
+
 @university_router.get("/university/", summary="Получить данные университета")
 async def get_university(id) -> University: 
     return University
