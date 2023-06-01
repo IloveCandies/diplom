@@ -58,13 +58,12 @@ async def path_student(new_student_data: StudentData, request: Request, ) -> Stu
     return await get_student_by_id(user_id)
 
 
-
-   
-@student_router.delete("/student/delete/", summary="Удалить студента")
-async def delete_student(id) -> Student: 
-    return Student
-
 @student_router.get("/students/", summary="Получить данные всех студентов")
 async def get_students() -> List[Student]: 
     query = student_table.select()
     return await database.fetch_all(query)
+
+   
+@student_router.delete("/student/delete/", summary="Удалить студента", deprecated=True)
+async def delete_student(id) -> Student: 
+    return Student

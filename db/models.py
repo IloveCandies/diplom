@@ -121,6 +121,27 @@ favorites_item_table = Table(
     Column("message", String),
     
 )
+
+
+
+region_table = Table(
+    "Region",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("code", Integer, unique = True),
+    Column("name", String, unique =True),
+    
+)
+
+city_table = Table(
+    "City",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("region", Integer, ForeignKey("Region.id")),
+    Column("name", String, unique = True),
+    
+)
+
 #удалить потом на проде
 #metadata.drop_all(engine)
 metadata.create_all(engine)

@@ -9,14 +9,14 @@ university_staff_router = APIRouter (
     responses={404: {"description": "Not found"}})
 
 
-@university_staff_router.get("/university/staff/", summary="Получить данные об  сотруднике")
+@university_staff_router.get("/university/staff/", summary="Получить данные об  сотруднике", deprecated=True)
 async def get_student_education(staff_id) -> UniversityStaff: 
     return UniversityStaff
 
-@university_staff_router.patch("/university/staff/path/", summary="Обновить данные  сотрудникае")
+@university_staff_router.patch("/university/staff/path/", summary="Обновить данные  сотрудникае", deprecated=True)
 async def path_student_education(staff_id) -> UniversityStaff: 
     return UniversityStaff
    
-@university_staff_router.delete("/university/staff/", summary="Удалить сотрудника")
+@university_staff_router.delete("/university/staff/", summary="Удалить сотрудника", deprecated=True)
 async def delete_student_education(staff_id) -> UniversityStaff: 
     return UniversityStaff

@@ -7,6 +7,10 @@ city_router = APIRouter()
 async def add_city() -> University: 
     return University
 
+@city_router.post("/city/add/region", summary="Прикрепить город к региону")
+async def add_region_to_city() -> Region: 
+    return Region
+    
 @city_router.get("/city/", summary="Получить данные университета")
 async def get_city(id) -> University: 
     return University

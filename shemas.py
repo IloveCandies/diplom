@@ -98,6 +98,10 @@ class StudentEducation(BaseModel):
     disciplines: List[Discipline]
 
 class Region(BaseModel):
+    code:int
+    name:str
+
+class RegionTableRecord(BaseModel):
     id:int
     number:int
     name:str

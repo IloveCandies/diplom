@@ -31,7 +31,7 @@ async def get_dicsiplines() ->List[DisciplineTableRecord]:
     query = disciplines_table.select()
     return await database.fetch_all(query)
   
-@discipline_router.delete("/discipline/delete/", summary="Удалить дисциплину / доделать")
+@discipline_router.delete("/discipline/delete/", summary="Удалить дисциплину / доделать", deprecated=True)
 async def delete_shedule_plan(id) -> bool: 
     return True
 

@@ -101,10 +101,10 @@ async def get_favorites(request: Request) -> FavoriteList:
     print(type(user_favorite_list))
     return  user_favorite_list.dict()
    
-@favorite_list_router.delete("/favorites/remove/", summary="Удалить из списка избранного  НЕ ДОДЕЛАННО")
+@favorite_list_router.post("/favorites/remove/", summary="Удалить из списка избранного  НЕ ДОДЕЛАННО")
 async def remove_group_from_list(group_name:str, request: Request):
     user_id = int(request.cookies.get("user_id"))
-    favorite_list_id = await get_list(user_id)
+    favorite_list_id = await get_list_id(user_id)
     
     query = group_table.select().where(group_table.c.name == group_name)
     group_id = await database.execute(query)
