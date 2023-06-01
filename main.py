@@ -13,6 +13,7 @@ from routers.discipline import discipline_router
 from routers.auth import auth_router
 from routers.test import test_router
 from routers.region import region_router
+from routers.city import city_router
 #
 from db.init import database
 from fastapi_offline import FastAPIOffline
@@ -60,6 +61,7 @@ app.include_router(shedule_plan_router,tags=["Учебный план 90% сде
 app.include_router(favorite_list_router,tags=["Список избранного студента"])
 app.include_router(student_router,tags=["Студенты в РАЗРАБОТКЕ 80%"])
 app.include_router(region_router,tags=["Регион"])
+app.include_router(city_router,tags=["Город"])
 app.include_router(university_router,tags=["Методы ВУЗА ПОКА НЕ РЕАЛИЗОВАННЫ "])
 app.include_router(university_staff_router,tags=["Сотрудники ПОКА НЕ РЕАЛИЗОВАННЫ"])
 app.include_router(test_router,tags=["ТЕСТ"])

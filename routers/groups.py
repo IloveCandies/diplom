@@ -22,7 +22,7 @@ async def get_group_by_id(id:int) -> GroupDetail:
     if shedule_plan == None:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=None)
+                           course=group["course"], end_year=group["end_year"],shedule_plan=None, university=group["university"])
     else:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"], available_places=group["available_places"], potential_places=group["potential_places"],
                            course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 

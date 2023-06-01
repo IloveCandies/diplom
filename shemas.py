@@ -112,8 +112,8 @@ class CityTableRecord(BaseModel):
     name:str = ""
 
 class City(BaseModel):
-    region: Union[Region,None] = None
-    name:str = ""
+    region_code: int
+    city_name:str = ""
 
 
 class Education(BaseModel):
@@ -133,6 +133,36 @@ class LoginData(BaseModel):
     email:str = "default@mail.com"
     password:str  = ""
 
+
+
+
+class UniversityTableRecord(BaseModel):
+    id:int
+    name: str
+    сity: str
+    description: Union[str, None] = None
+        
+
+class University(BaseModel):
+    name: str
+    сity: str
+    description: Union[str, None] = None
+
+class UniversityDetail(BaseModel):
+    name: str
+    сity: City
+    description: Union[str, None] = None
+
+class Group(BaseModel):
+    name: str
+    year_of_recruitment:int
+    available_places:int
+    potential_places:int
+    course:int
+    end_year:int
+    shedule_plan_id:int
+    University: Union[str, None] = None
+
 class UniversityStaff(BaseModel):
     first_name:str = "Default"
     middle_name:str  ="Default"
@@ -141,6 +171,7 @@ class UniversityStaff(BaseModel):
     email:str = "default@mail.com"
     password:str  =""
     api_token:str =""
+    University:University;
 
 class UniversityStaffRecord(BaseModel):
     id:int
@@ -152,24 +183,6 @@ class UniversityStaffRecord(BaseModel):
     password:str
     api_token:str
 
-class University(BaseModel):
-    id:int
-    name: str
-    сity: City
-    description: Union[str, None] = None
-    university_staff: Union[List[UniversityStaff], None] = None
-        
-
-class Group(BaseModel):
-    name: str
-    year_of_recruitment:int
-    available_places:int
-    potential_places:int
-    course:int
-    end_year:int
-    shedule_plan_id:int
-
-
 # json учебного плана
 class GroupData(BaseModel):
     year_of_recruitment:int
@@ -177,8 +190,7 @@ class GroupData(BaseModel):
     potential_places:int
     course:int
     end_year:int
-
-
+   
 # json учебного плана
 class GroupDetail(BaseModel):
     name: str
@@ -188,6 +200,7 @@ class GroupDetail(BaseModel):
     course:int
     end_year:int
     shedule_plan:Union[ShedulePlan,None] = None
+    university: Union[str, None] = None
 
     class Config:
         orm_mode = True

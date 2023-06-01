@@ -37,14 +37,6 @@ async def get_region(code:int):
                             "msg": "Региона с таким кодом не существует"}})                     
     return Region(code = current_region.code,name = current_region.name)
 
-@region_router.patch("/region/path/", summary="Обновить данные региона")
-async def path_region(code:int, item:Region) -> Region: 
-    query = region_table.update().values(
-        code = item.code, name = item.name
-    ).where(region_table.c.code == code)
-    await database.execute(query)
-    return await get_region(item.code)
-   
 @region_router.get("/regions/", summary="Получить данные всех регионов")
 async def get_regions() -> List[Region]:
     query = region_table.select() 
@@ -53,6 +45,16 @@ async def get_regions() -> List[Region]:
     for region in regions:
         current_regions.append(Region(code = region.code,name = region.name))
     return current_regions
+
+@region_router.patch("/region/path/", summary="Обновить данные региона")
+async def path_region(code:int, item:Region) -> Region: 
+    query = region_table.update().values(
+        code = item.code, name = item.name
+    ).where(region_table.c.code == code)
+    await database.execute(query)
+    return await get_region(item.code)
+   
+
 
 @region_router.delete("/region/delete/", summary="Удалить регион", deprecated=True)
 async def delete_region(code:int) -> Region: 

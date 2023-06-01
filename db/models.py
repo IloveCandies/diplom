@@ -5,6 +5,9 @@ from db.init import Base, metadata, engine
 from shemas import Education_level, Education_form
 
 
+
+
+
 oop_table = Table(
     "OOP",
     metadata,
@@ -75,6 +78,7 @@ group_table = Table(
     Column("course", Integer),
     Column("end_year", Integer),
     Column("shedule_plan",Integer, ForeignKey("ShedulePlan.id")),
+    
 )
 
 staff_table = Table(
@@ -137,10 +141,22 @@ city_table = Table(
     "City",
     metadata,
     Column("id", Integer, primary_key=True, index=True),
-    Column("region", Integer, ForeignKey("Region.id")),
-    Column("name", String, unique = True),
+    Column("region_code", Integer, ForeignKey("Region.code")),
+    Column("city_name", String, unique = True),
     
 )
+
+
+university_table = Table(
+    "University",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("name", String, unique=True),
+    Column("city", String, ForeignKey("City.city_name")),
+    Column("description", String),
+)
+
+
 
 #удалить потом на проде
 #metadata.drop_all(engine)
