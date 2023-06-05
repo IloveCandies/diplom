@@ -11,6 +11,8 @@ favorite_list_router =  APIRouter(responses={400: {"model": Message}, 401: {"mod
 async def get_list_id(user_id):
     query =  favorites_table.select().where(favorites_table.c.student == user_id)
     favorite_list = await database.fetch_one(query)
+    if favorite_list == None:
+        query =  favorites_table.insert().values(student = user_id)
     return favorite_list["id"]
 
 async def get_all_items_details(user_id) -> FavoriteList:
