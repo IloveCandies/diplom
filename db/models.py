@@ -81,19 +81,7 @@ group_table = Table(
     
 )
 
-staff_table = Table(
-    "UniversityStaff",
-    metadata,
-    Column("id", Integer, primary_key=True, index=True),
-    Column("first_name",String),
-    Column("middle_name", String),
-    Column("last_name", String),
-    Column("phone", String, unique = True),
-    Column("email", String, unique = True),
-    Column("password", String),
-    Column("salt", String),
-    Column("api_token", String),
-)
+
 
 student_table = Table(
     "Student",
@@ -156,7 +144,20 @@ university_table = Table(
     Column("description", String),
 )
 
-
+staff_table = Table(
+    "UniversityStaff",
+    metadata,
+    Column("id", Integer, primary_key=True, index=True),
+    Column("first_name",String),
+    Column("middle_name", String),
+    Column("last_name", String),
+    Column("phone", String, unique = True),
+    Column("email", String, unique = True),
+    Column("password", String),
+    Column("salt", String),
+    Column("api_token", String),
+    Column("university",String, ForeignKey("University.name"))
+)
 
 #удалить потом на проде
 #metadata.drop_all(engine)

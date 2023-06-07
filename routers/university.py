@@ -42,7 +42,6 @@ async def add_university(item:University) -> bool:
 async def get_university(university_name:str) -> University:
     query = university_table.select().where(university_table.c.name == university_name) 
     university = await database.fetch_one(query)
-    print(university.city) 
     if university == None:
         return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
@@ -64,9 +63,9 @@ async def delete_university(university_name:str) -> University:
 async def get_universitys() -> List[University]:
     universities =[]
     query = university_table.select()
-    current_universities =  await database.execute(query)
+    current_universities =  await database.fetch_all(query)
     for university in current_universities:
-        universities.append(University(name=university.name,city =university.city, description= university.description))
+        universities.append(University(name=university.name,city = university.city, description= university.description))
 
-    return List[University]
+    return universities
 

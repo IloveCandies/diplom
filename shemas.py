@@ -145,7 +145,7 @@ class UniversityTableRecord(BaseModel):
 
 class University(BaseModel):
     name: str
-    сity: str
+    сity: Union[str, None] = None
     description: Union[str, None] = None
 
 class UniversityDetail(BaseModel):
@@ -172,6 +172,25 @@ class UniversityStaff(BaseModel):
     password:str  =""
     api_token:str =""
     University:University;
+
+class UniversityStaff(BaseModel):
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str  =""
+    api_token:str =""
+    university:University;
+
+class UniversityStaffData(BaseModel):
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    university:str;
+
 
 class UniversityStaffRecord(BaseModel):
     id:int

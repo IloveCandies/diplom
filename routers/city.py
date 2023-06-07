@@ -11,7 +11,7 @@ city_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Messa
 
 
 @city_router.get("/city/", summary="Получить данные города")
-async def get_city(city_name) -> University: 
+async def get_city(city_name) -> City: 
     query = city_table.select().where(city_table.c.city_name == city_name)
     current_city = await database.fetch_one(query)
     if current_city == None:
@@ -21,13 +21,13 @@ async def get_city(city_name) -> University:
     return City(region_code = current_city.region_code,city_name = current_city.city_name)
 
 @city_router.get("/cities/", summary="Получить данные всех университет")
-async def get_cities() -> List[University]: 
+async def get_cities() -> List[City]: 
     query = city_table.select() 
     current_sities = []
     cities = await database.fetch_all(query)
     for city in cities:
         current_sities.append(City(region_code = city.region_code,city_name = city.city_name))
-    return List[University]
+    return cities
 
 @city_router.post("/city/add/", summary="Добавить новый город")
 async def add_city(item:City) -> bool: 
@@ -59,11 +59,11 @@ async def add_region_to_city(city_name :str, region_code:int) -> Region:
     return await get_city
     
 
-@city_router.patch("/city/path/", summary="Обновить данные университета",deprecated=True)
-async def path_city(id) -> University: 
-    return University
+@city_router.patch("/city/path/", summary="Обновить данные города",deprecated=True)
+async def path_city(id) -> City: 
+    return City
    
-@city_router.delete("/city/delete/", summary="Удалить университет",deprecated=True)
-async def delete_city(id) -> University: 
-    return University
+@city_router.delete("/city/delete/", summary="Удалить город",deprecated=True)
+async def delete_city(id) -> City: 
+    return City
 
