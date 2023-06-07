@@ -51,7 +51,7 @@ async def create_staff(response: Response,request: Request, staff_data:Universit
 
 
 @university_staff_router.get("/university/staff/", summary="Получить данные об  сотруднике")
-async def get_staff(staff_email:str) -> UniversityStaffData: 
+async def get_staff_by_email(staff_email:str) -> UniversityStaffData: 
     query = staff_table.select().where(staff_table.c.email == staff_email)
 
     staff_data = await database.fetch_one(query)
@@ -64,7 +64,7 @@ async def get_staff(staff_email:str) -> UniversityStaffData:
         
 
 @university_staff_router.get("/university/staff/{staff_id}", summary="Получить данные об  сотруднике")
-async def get_staff(staff_id:int) -> UniversityStaffData: 
+async def get_staff_by_id(staff_id:int) -> UniversityStaffData: 
     query = staff_table.select().where(staff_table.c.id == staff_id)
     staff_data = await database.fetch_one(query)
     if staff_data == None:
@@ -86,10 +86,35 @@ async def get_staff() -> List[UniversityStaffData]:
     return staff_list
 
 
-@university_staff_router.patch("/university/staff/path/", summary="Обновить данные  сотрудникае", deprecated=True)
-async def path_student_education(staff_id) -> UniversityStaff: 
-    return UniversityStaff
-   
+@university_staff_router.patch("/university/staff/{staff_id}/patch/", summary="Обновить данные  сотрудникае")
+async def path_student_education(staff_id:int, staff_data:UniversityStaffData) -> UniversityStaffData: 
+    _university_query = university_table.select().where(university_table.c.name ==staff_data.university) 
+    _university = await database.fetch_one(_university_query)
+    if _university == None:
+        return JSONResponse(status_code=422, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Университета с таким названием не существует в базе данных"}})
+
+    query = staff_table.update().values(first_name = staff_data.first_name,middle_name = staff_data.middle_name, 
+                last_name=staff_data.last_name, phone =staff_data.phone, email=staff_data.email, university=_university.name).where(staff_table.c.id == staff_id)
+    await database.execute(query)
+    return await get_staff_by_id(staff_id)
+
+
+@university_staff_router.patch("/university/staff/patch/", summary="Обновить данные  сотрудникае")
+async def path_student_education(staff_email:str, staff_data:UniversityStaffData) -> UniversityStaffData: 
+    _university_query = university_table.select().where(university_table.c.name ==staff_data.university) 
+    _university = await database.fetch_one(_university_query)
+    if _university == None:
+        return JSONResponse(status_code=422, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Университета с таким названием не существует в базе данных"}})
+
+    query = staff_table.update().values(first_name = staff_data.first_name,middle_name = staff_data.middle_name, 
+                last_name=staff_data.last_name, phone =staff_data.phone, email=staff_data.email, university=_university.name).where(staff_table.c.email == staff_email)
+    await database.execute(query)
+    return await get_staff_by_email(staff_data.email)
+
 @university_staff_router.delete("/university/staff/", summary="Удалить сотрудника", deprecated=True)
-async def delete_student_education(staff_id) -> UniversityStaff: 
+async def delete_staff(staff_id) -> UniversityStaff: 
     return UniversityStaff
