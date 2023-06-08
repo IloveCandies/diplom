@@ -89,7 +89,7 @@ async def add_plan(shedule_plan_code:str, group_name:str) -> GroupDetail:
                                     disciplines=[])
     return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan_detail)
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan_detail, university=group["university"])
 
 
 
@@ -109,7 +109,7 @@ async def get_group(group_name:str) ->GroupDetail:
     else:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"],
                            available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan)
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan, university=group["university"])
 
 
 
@@ -144,6 +144,6 @@ async def path_group(group_name:str, group_data: GroupData) ->bool:
     query = group_table.update().values( year_of_recruitment = group_data.year_of_recruitment, 
                                         available_places = group_data.available_places,
                                         potential_places = group_data.potential_places, course = group_data.course, 
-                                        end_year = group_data.end_year).where(group_table.c.name == group_name )
+                                        end_year = group_data.end_year, university=group_data.university).where(group_table.c.name == group_name )
     await database.execute(query)
     return True

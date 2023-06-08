@@ -78,6 +78,7 @@ group_table = Table(
     Column("course", Integer),
     Column("end_year", Integer),
     Column("shedule_plan",Integer, ForeignKey("ShedulePlan.id")),
+    Column("university",String, ForeignKey("University.name"))
     
 )
 
