@@ -125,6 +125,7 @@ class Education(BaseModel):
     date_of_end_education: datetime.date
     
 
+
 class LoginData(BaseModel):
     first_name:str = "Default"
     middle_name:str  ="Default"
@@ -132,8 +133,6 @@ class LoginData(BaseModel):
     phone:str = "8-800-555-35-35"
     email:str = "default@mail.com"
     password:str  = ""
-
-
 
 
 class UniversityTableRecord(BaseModel):
@@ -280,17 +279,27 @@ class Student(BaseModel):
     сity: Union[City,None] = None
  
 
-class StudentData(BaseModel):
-    first_name:str
-    middle_name:str
-    last_name:str
-    phone:str = ""
 
 class StudentData(BaseModel):
-    first_name:str
-    middle_name:str
-    last_name:str
-    phone:str = ""
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    city:str ="city"
+
+
+
+
+class StudentLoginData(BaseModel):
+    first_name:str = "Default"
+    middle_name:str  ="Default"
+    last_name:str  = "Default"
+    phone:str = "8-800-555-35-35"
+    email:str = "default@mail.com"
+    password:str = "password"
+    city:str ="city"
+
 
 class Item(BaseModel):
     id: str

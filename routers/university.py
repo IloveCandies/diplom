@@ -34,7 +34,6 @@ async def add_university(item:University) -> bool:
         return  JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Университет с таким названием уже существует"}})
-    return  True
 
 
 

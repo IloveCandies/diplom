@@ -15,7 +15,7 @@ async def update_student_by_id(id) -> bool:
 
 
 @student_router.get("/student/{id}", summary="Получить данные студента")
-async def get_student_by_id(id:int) -> Student: 
+async def get_student_by_id(id:int) -> StudentData: 
     query = student_table.select().where(student_table.c.id == id)
     student = await database.fetch_one(query)
     if student == None:
@@ -24,11 +24,11 @@ async def get_student_by_id(id:int) -> Student:
                             "msg": "Пользователя с таким именем не существует "}})
 
     return Student(first_name=student["first_name"],middle_name=student["middle_name"],
-                    last_name=student["last_name"],phone=student["phone"], city = None)
+                    last_name=student["last_name"],phone=student["phone"], city = student["city"])
 
 
 @student_router.get("/student/", summary="Получить данные студента через email")
-async def get_student_by_email(email:str) -> Student:
+async def get_student_by_email(email:str) -> StudentData:
     query = student_table.select().where(student_table.c.email == email)
     student = await database.fetch_one(query)
     if student == None:
@@ -37,10 +37,10 @@ async def get_student_by_email(email:str) -> Student:
                             "msg": "Пользователя с таким именем не существует "}})
 
     return Student(first_name=student["first_name"],middle_name=student["middle_name"],
-                    last_name=student["last_name"],phone=student["phone"], city = None) 
+                    last_name=student["last_name"],phone=student["phone"], city = student["city"]) 
 
 @student_router.patch("/student/{id}/path/", summary="Обновить данные студента из админки")
-async def path_student(id:int, new_student_data: StudentData) -> Student: 
+async def path_student(id:int, new_student_data: StudentData) -> StudentData: 
     query = student_table.update().values( first_name = new_student_data.last_name, 
                                          middle_name = new_student_data.middle_name ,
                                          last_name = new_student_data.last_name ).where(student_table.c.id == id)
@@ -49,17 +49,17 @@ async def path_student(id:int, new_student_data: StudentData) -> Student:
 
 
 @student_router.patch("/student/path/", summary="Обновить данные в настройках (через куки)")
-async def path_student(new_student_data: StudentData, request: Request, ) -> Student: 
+async def path_student(new_student_data: StudentData, request: Request, ) -> StudentData: 
     user_id = int(request.cookies.get("user_id"))
     query = student_table.update().values( first_name = new_student_data.last_name, 
                                          middle_name = new_student_data.middle_name ,
-                                         last_name = new_student_data.last_name ).where(student_table.c.id == user_id)
+                                         last_name = new_student_data.last_name, city = new_student_data.city).where(student_table.c.id == user_id)
     await database.execute(query)
     return await get_student_by_id(user_id)
 
 
 @student_router.get("/students/", summary="Получить данные всех студентов")
-async def get_students() -> List[Student]: 
+async def get_students() -> List[StudentData]: 
     query = student_table.select()
     return await database.fetch_all(query)
 

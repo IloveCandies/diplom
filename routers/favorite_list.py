@@ -148,3 +148,6 @@ async def remove_group_from_list(group_name:str, student_id:int ,request: Reques
         return await get_all_items_details(student_id)
     except:
             raise Exception("Непредвиденная ошибка")
+
+
+

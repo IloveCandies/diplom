@@ -9,7 +9,6 @@ from sqlite3 import IntegrityError
 from middleware.jwt import *
 
 
-
 auth_router = APIRouter(responses={400: {"model": Message}, 401: {"model": Message},404: {"model": Message}, 422: {"model": Message}})
 
 
@@ -45,16 +44,16 @@ async def auth(response: Response,request: Request, login_data:LoginData ):
     
 
 @auth_router.post("/sign_up/student/", summary="")
-async def auth(response: Response,request: Request, login_data:LoginData ): 
+async def auth(response: Response,request: Request, login_data:StudentLoginData ): 
     values = { "first_name":login_data.first_name,"middle_name":login_data.middle_name, 
-    "last_name":login_data.last_name,"phone":login_data.phone, "email":login_data.email }
+    "last_name":login_data.last_name,"phone":login_data.phone, "email":login_data.email ,"city":login_data.city}
 
     password, salt = await hashing.encode_password(login_data.password)
     values["password"],values["salt"] = password, salt 
 
     query = """INSERT INTO "Student" (first_name, last_name, middle_name,
-    phone, email, password, salt) 
-    SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt
+    phone, email, password, salt, city) 
+    SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt ,:city
     RETURNING  id"""
     
     try:

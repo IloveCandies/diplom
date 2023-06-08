@@ -94,6 +94,7 @@ student_table = Table(
     Column("email",String, unique = True),
     Column("password", String),
     Column("salt", String),
+    Column("city", String)
     
 )
 
