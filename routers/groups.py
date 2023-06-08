@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Security
 from asyncpg import exceptions
 from shemas import *
-from db.models import group_table, shedule_plan_table, oop_table
+from db.models import group_table, shedule_plan_table, oop_table, university_table
 from db.init import database
 from fastapi.responses import JSONResponse
 from middleware.jwt import *
@@ -25,15 +25,23 @@ async def get_group_by_id(id:int) -> GroupDetail:
                            course=group["course"], end_year=group["end_year"],shedule_plan=None)
     else:
         return GroupDetail(name=group["name"], year_of_recruitment=group["year_of_recruitment"], available_places=group["available_places"], potential_places=group["potential_places"],
-                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan) 
+                           course=group["course"], end_year=group["end_year"],shedule_plan=shedule_plan, university = item.university) 
 
 
 @group_router.post("/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
 async def add_group(item: Group) -> GroupDetail: 
+    
+    query = university_table.select().where(university_table.c.name == item.university)
+    university = await database.fetch_one(query)
+    if university == None:
+        return JSONResponse(status_code=422, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Университета с таким именем не существует "}})   
+
     query = group_table.insert().values(
-        name = item.name, year_of_recruitment = item.year_of_recruitment,
-        available_places = item.available_places, potential_places = item.potential_places,
-        course = item.course, end_year = item.end_year, university = item.university)
+            name = item.name, year_of_recruitment = item.year_of_recruitment,
+            available_places = item.available_places, potential_places = item.potential_places,
+            course = item.course, end_year = item.end_year, university = university.name)
     try:
         await database.execute(query)
     except (exceptions.UniqueViolationError):
