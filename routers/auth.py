@@ -56,6 +56,8 @@ async def auth(response: Response,request: Request, login_data:StudentLoginData 
     SELECT :first_name,:middle_name,:last_name, :phone, :email, :password, :salt ,:city
     RETURNING  id"""
     
+
+
     try:
         await database.execute(query=query, values=values)
         return True

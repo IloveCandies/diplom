@@ -22,5 +22,6 @@ services:
       - POSTGRES_USER=transfer
       - POSTGRES_PASSWORD=transfer
       - POSTGRES_DB=transferdb
+    command: psql -U transfer -d postgres -c "CREATE DATABASE transferdb;"
 volumes:
   postgres_data:

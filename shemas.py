@@ -160,7 +160,7 @@ class Group(BaseModel):
     course:int
     end_year:int
     shedule_plan_id:int
-    University: Union[str, None] = None
+    university: Union[str, None] = None
 
 class UniversityStaff(BaseModel):
     first_name:str = "Default"

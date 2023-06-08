@@ -29,11 +29,11 @@ async def get_group_by_id(id:int) -> GroupDetail:
 
 
 @group_router.post("/group/create/", summary="Добавить новую группу  тут пока нет года окончания и плана, добавлю  как готово будет")
-async def add_group(item: Group) -> Group: 
+async def add_group(item: Group) -> GroupDetail: 
     query = group_table.insert().values(
         name = item.name, year_of_recruitment = item.year_of_recruitment,
         available_places = item.available_places, potential_places = item.potential_places,
-        course = item.course, end_year = item.end_year)
+        course = item.course, end_year = item.end_year, university = item.university)
     try:
         await database.execute(query)
     except (exceptions.UniqueViolationError):
