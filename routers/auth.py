@@ -88,7 +88,7 @@ async def sign_in(email:str, password:str)->UniversityStaffRecord:
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
 @auth_router.post("/sign_in/student/", summary="")
-async def sign_in(email:str, password:str, response: Response)->Student: 
+async def sign_in(email:str, password:str, response: Response)->StudentData: 
     query = student_table.select().where(student_table.c.email == email)
     student = await database.fetch_one(query)
 
