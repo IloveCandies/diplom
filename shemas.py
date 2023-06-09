@@ -74,6 +74,13 @@ class ShedulePlanDetail(BaseModel):
     period:int
 
 
+class EmailAndPassword(BaseModel):
+    email:str = "default@mail.mail"
+    password:str = "default@mail.mail"
+
+
+
+
 class ShedulePlanTableRecord(BaseModel):
     code:str
     recruitment_year:datetime.date

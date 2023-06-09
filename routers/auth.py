@@ -73,30 +73,30 @@ async def auth(response: Response,request: Request, login_data:StudentLoginData 
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
 @auth_router.post("/sign_in/staff/", summary="")
-async def sign_in(email:str, password:str)->UniversityStaffRecord: 
-    query = staff_table.select().where(staff_table.c.email == email)
+async def sign_in(login_data:EmailAndPassword)->UniversityStaffRecord: 
+    query = staff_table.select().where(staff_table.c.email == login_data.email)
     staff = await database.fetch_one(query)
     if staff == None:
         return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователя с таким именем не существует "}})
 
-    if await hashing.check_password(password,staff["password"],staff["salt"]) == True:
+    if await hashing.check_password(login_data.password,staff["password"],staff["salt"]) == True:
         return staff
     else:
         return staff["password"]
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
 @auth_router.post("/sign_in/student/", summary="")
-async def sign_in(email:str, password:str, response: Response)->StudentData: 
-    query = student_table.select().where(student_table.c.email == email)
+async def sign_in(login_data:EmailAndPassword, response: Response)->StudentData: 
+    query = student_table.select().where(student_table.c.email == login_data.email)
     student = await database.fetch_one(query)
 
     if student == None:
         return JSONResponse(status_code=422, content = {"detail":
                             {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
                             "msg": "Пользователя с таким именем не существует "}})
-    if await hashing.check_password(password,student["password"],student["salt"]) == True:
+    if await hashing.check_password(login_data.password,student["password"],student["salt"]) == True:
         response.set_cookie(key="user_id", value = student["id"])    
         return student
     else:
