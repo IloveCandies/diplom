@@ -84,7 +84,9 @@ async def sign_in(login_data:EmailAndPassword)->UniversityStaffRecord:
     if await hashing.check_password(login_data.password,staff["password"],staff["salt"]) == True:
         return staff
     else:
-        return staff["password"]
+        return JSONResponse(status_code=422, content = {"detail":
+                            {"datetime":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+                            "msg": "Неверный пароль"}})
 
 #JSONResponse(status_code=404, content = {"description": "Not found","request_date":datetime.datetime.now().timestamp()
 @auth_router.post("/sign_in/student/", summary="")

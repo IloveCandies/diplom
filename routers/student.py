@@ -24,7 +24,7 @@ async def get_student_by_id(id:int) -> StudentData:
                             "msg": "Пользователя с таким именем не существует "}})
 
     return Student(first_name=student["first_name"],middle_name=student["middle_name"],
-                    last_name=student["last_name"],phone=student["phone"], city = student["city"])
+                    last_name=student["last_name"],phone=student["phone"], email=student["email"], city = student["city"])
 
 
 @student_router.get("/student/", summary="Получить данные студента через email")
@@ -37,7 +37,7 @@ async def get_student_by_email(email:str) -> StudentData:
                             "msg": "Пользователя с таким именем не существует "}})
 
     return Student(first_name=student["first_name"],middle_name=student["middle_name"],
-                    last_name=student["last_name"],phone=student["phone"], city = student["city"]) 
+                    last_name=student["last_name"],phone=student["phone"], email=student["email"], city = student["city"]) 
 
 @student_router.patch("/student/{id}/path/", summary="Обновить данные студента из админки")
 async def path_student(id:int, new_student_data: StudentData) -> StudentData: 
